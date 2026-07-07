@@ -1,271 +1,280 @@
-# Thru Alphanet — Complete Developer Guide
+<p align="center">
+  <img src="https://img.shields.io/badge/status-alphanet-yellow?style=for-the-badge&labelColor=1a1a2e" alt="Status">
+  <img src="https://img.shields.io/badge/thru-v0.2.27-blue?style=for-the-badge&labelColor=1a1a2e" alt="Version">
+  <img src="https://img.shields.io/badge/RISC--V-64--bit-orange?style=for-the-badge&labelColor=1a1a2e" alt="VM">
+  <img src="https://img.shields.io/badge/license-MIT-green?style=for-the-badge&labelColor=1a1a2e" alt="License">
+</p>
 
-> Comprehensive reference for building on Thru, a high-performance blockchain network for ultra-low latency, ultra-high throughput applications.
+<h1 align="center">
+  <br>
+  ⚡ Thru Alphanet
+  <br>
+</h1>
 
-**Status:** Alphanet (pre-mainnet)  
-**Docs:** [docs.thru.org](https://docs.thru.org)  
-**GitHub:** [Unto-Labs/thru](https://github.com/Unto-Labs/thru)  
-**RPC:** `https://rpc.alphanet.thru.org`  
-**Explorer:** [scan.thru.org](https://scan.thru.org)
+<p align="center">
+  <b>Complete Developer Guide</b><br>
+  <sub>Build ultra-high performance programs on Thru — the RISC-V blockchain</sub>
+</p>
 
----
+<p align="center">
+  <a href="https://docs.thru.org">Docs</a> •
+  <a href="https://github.com/Unto-Labs/thru">GitHub</a> •
+  <a href="https://scan.thru.org">Explorer</a> •
+  <a href="https://docs.thru.org/llms-full.txt">LLM Docs</a>
+</p>
 
-## Table of Contents
-
-- [What is Thru](#what-is-thru)
-- [Architecture Overview](#architecture-overview)
-- [Quick Start](#quick-start)
-- [DevKit Setup](#devkit-setup)
-- [CLI Reference](#cli-reference)
-- [Program Development (C SDK)](#program-development-c-sdk)
-- [ABI System](#abi-system)
-- [Core Concepts](#core-concepts)
-- [Virtual Machine (ThruVM)](#virtual-machine-thruvm)
-- [Runtime & Execution](#runtime--execution)
-- [Accounts & State](#accounts--state)
-- [SDKs & Packages](#sdks--packages)
-- [APIs](#apis)
-- [Wallet & Passkey](#wallet--passkey)
-- [Token Program](#token-program)
-- [NFT Program](#nft-program)
-- [Core Specifications](#core-specifications)
-- [Building with AI Agents](#building-with-ai-agents)
-- [Useful Commands Cheat Sheet](#useful-commands-cheat-sheet)
+<br>
 
 ---
 
-## What is Thru
+## 📋 Table of Contents
 
-Thru is a high-performance blockchain network built by [Unto-Labs](https://github.com/Unto-Labs). Key characteristics:
+<details>
+<summary><b>🚀 Getting Started</b></summary>
 
-- **Ultra-high throughput** with sub-millisecond latency
-- **RISC-V based VM** (ThruVM) — programs written in C, compiled to RISC-V bytecode
-- **Account-based state model** with compression and state proofs
-- **Developer-first** — comprehensive SDKs, CLI, and AI-agent friendly docs
-- **gRPC + REST APIs** for high-performance and browser-based access
+- [What is Thru](#-what-is-thru)
+- [Quick Start](#-quick-start)
+- [DevKit Setup](#-devkit-setup)
+- [Configuration](#-configuration)
 
-### Why Thru?
+</details>
 
-| Feature | Thru | Traditional Blockchains |
-|---------|------|------------------------|
-| VM Architecture | RISC-V (64-bit) | EVM, WASM, custom |
-| Program Language | C (native) | Solidity, Rust, etc. |
-| Latency | Sub-millisecond | Seconds to minutes |
-| State Model | Accounts + Compression | Accounts/UTXO |
-| Developer Tooling | CLI + SDK + MCP | Varies |
+<details>
+<summary><b>🛠️ Development</b></summary>
 
----
+- [Program Development (C SDK)](#-program-development-c-sdk)
+- [ABI System](#-abi-system)
+- [Core Concepts](#-core-concepts)
 
-## Architecture Overview
+</details>
 
-```
-┌─────────────────────────────────────────────┐
-│                 Applications                 │
-│         (Web, Mobile, Backend)               │
-└─────────────────┬───────────────────────────┘
-                  │ RPC / gRPC
-┌─────────────────▼───────────────────────────┐
-│              RPC Nodes                       │
-│    (Query, Submit Transactions)              │
-└─────────────────┬───────────────────────────┘
-                  │
-┌─────────────────▼───────────────────────────┐
-│           Validator Network                  │
-│  ┌─────────────────────────────────────┐    │
-│  │         ThruVM (RISC-V)             │    │
-│  │   Execute programs deterministically │    │
-│  └─────────────────────────────────────┘    │
-│  ┌─────────────────────────────────────┐    │
-│  │      Consensus (agreement)          │    │
-│  └─────────────────────────────────────┘    │
-│  ┌─────────────────────────────────────┐    │
-│  │      State Tree (Merkle)            │    │
-│  │   Accounts + Compression            │    │
-│  └─────────────────────────────────────┘    │
-└─────────────────────────────────────────────┘
-```
+<details>
+<summary><b>⚙️ Architecture</b></summary>
 
-### Key Components
+- [Virtual Machine (ThruVM)](#-virtual-machine-thruvm)
+- [Runtime & Execution](#-runtime--execution)
+- [Accounts & State](#-accounts--state)
 
-| Component | Description |
-|-----------|-------------|
-| **ThruVM** | RISC-V virtual machine executing smart contracts |
-| **Validators** | Physical nodes running consensus and execution |
-| **RPC Nodes** | Interface for clients to query/submit transactions |
-| **State Tree** | Merkle tree storing account state with compression support |
-| **gRPC API** | High-performance Protocol Buffers API |
-| **Explorer MCP** | Live chain context for AI coding agents |
+</details>
+
+<details>
+<summary><b>🔌 Integration</b></summary>
+
+- [SDKs & Packages](#-sdks--packages)
+- [APIs (gRPC, REST, MCP)](#-apis)
+- [Wallet & Passkey](#-wallet--passkey)
+
+</details>
+
+<details>
+<summary><b>📦 On-Chain Programs</b></summary>
+
+- [Token Program](#-token-program)
+- [NFT Program](#-nft-program)
+
+</details>
+
+<details>
+<summary><b>🤖 AI & Automation</b></summary>
+
+- [Building with AI Agents](#-building-with-ai-agents)
+- [Useful Commands](#-useful-commands-cheat-sheet)
+
+</details>
+
+<br>
 
 ---
 
-## Quick Start
+## 🌟 What is Thru
 
-### 1. Install CLI
+<p align="center">
+  <img src="https://img.shields.io/badge/ULTRA--HIGH_PERFORMANCE-sub--ms_latency-critical?style=flat-square&labelColor=0d1117&color=critical" alt="Performance">
+  <img src="https://img.shields.io/badge/RISC--V_VM-native_execution-success?style=flat-square&labelColor=0d1117" alt="VM">
+  <img src="https://img.shields.io/badge/C_SDK-native_programs-informational?style=flat-square&labelColor=0d1117" alt="SDK">
+</p>
 
-```bash
-npm i -g thru
-```
+<br>
 
-Or via .deb/.rpm:
-```bash
-# Debian/Ubuntu
-curl -fsSLO https://github.com/Unto-Labs/thru/releases/download/v0.2.27/thru_0.2.27_amd64.deb
-sudo apt install ./thru_0.2.27_amd64.deb
+**Thru** is a next-generation blockchain network built for developers who need enterprise-grade speed and reliability.
 
-# RHEL/Fedora
-sudo dnf install https://github.com/Unto-Labs/thru/releases/download/v0.2.27/thru-0.2.27-1.x86_64.rpm
-```
+<table>
+<tr>
+<td width="50%">
 
-### 2. Verify
+### ✨ Key Features
 
-```bash
-thru --help
-thru getversion
-```
+- **⚡ Sub-millisecond latency** — industry-leading transaction speed
+- **🔧 RISC-V VM** — native 64-bit execution environment
+- **📦 C Programs** — write smart contracts in C
+- **🗜️ State Compression** — efficient storage with Merkle proofs
+- **🤖 AI-Ready** — MCP tools for coding agents
+- **🌐 gRPC + REST** — high-performance APIs
 
-### 3. Generate Keypair
+</td>
+<td width="50%">
 
-```bash
-thru keys generate default
-```
+### 📊 Why Thru?
 
-### 4. Create Account
+| | Thru | Others |
+|---|:---:|:---:|
+| **VM** | RISC-V | EVM/WASM |
+| **Language** | C | Solidity |
+| **Latency** | `<1ms` | `1s+` |
+| **State Model** | Accounts + Compress | Accounts |
+| **AI Support** | Native MCP | Limited |
 
-```bash
-thru account create default
-```
+</td>
+</tr>
+</table>
 
-### 5. Get Testnet Tokens
-
-```bash
-thru faucet request default
-```
-
-### 6. Deploy a Program
-
-```bash
-thru program create my_program ./path/to/program.bin
-```
+<br>
 
 ---
 
-## DevKit Setup
+## ⚡ Quick Start
 
-### Prerequisites
+<br>
 
-- **Node.js 18+** — [nodejs.org](https://nodejs.org)
-- **Linux x64** (recommended) with `curl` and `sudo`
-- macOS/Windows supported for CLI, Linux needed for full toolchain
+<table>
+<tr>
+<td width="60%">
 
-### Full Setup
+### 🚀 Get Running in 60 Seconds
 
 ```bash
 # 1. Install CLI
 npm i -g thru
 
-# 2. Install RISC-V toolchain
+# 2. Verify installation
+thru --help
+
+# 3. Check network
+thru getversion
+
+# 4. Generate keypair
+thru keys generate default
+
+# 5. Create account
+thru account create default
+
+# 6. Get testnet tokens
+thru faucet request default
+```
+
+</td>
+<td width="40%">
+
+### 📦 Installation Options
+
+| Method | Command |
+|--------|---------|
+| **npm** | `npm i -g thru` |
+| **deb** | `apt install ./thru_*.deb` |
+| **rpm** | `dnf install ./thru-*.rpm` |
+| **cargo** | `cargo install thru` |
+
+<br>
+
+> 💡 **npm** is recommended — no Rust toolchain needed
+
+</td>
+</tr>
+</table>
+
+<br>
+
+---
+
+## 🛠️ DevKit Setup
+
+<br>
+
+### Prerequisites
+
+| Requirement | Version | Notes |
+|------------|---------|-------|
+| **Node.js** | 18+ | [nodejs.org](https://nodejs.org) |
+| **OS** | Linux x64 | Recommended for full toolchain |
+| **macOS** | ARM64/x64 | CLI works, limited toolchain |
+| **Windows** | x64 | CLI works via WSL |
+
+<br>
+
+### Full Setup
+
+```bash
+# Install CLI globally
+npm i -g thru
+
+# Install RISC-V cross-compilation toolchain
 thru dev toolchain install
 
-# 3. Install C SDK
+# Install C SDK
 thru dev sdk install c
 
-# 4. Verify
+# Verify everything
 thru --help
 ```
 
-### SDK Locations
+<br>
 
-| Component | Default Path |
-|-----------|-------------|
-| C SDK | `~/.thru/sdk/c/thru-sdk/` |
-| Toolchain | `~/.thru/sdk/toolchain/` |
-| Config | `~/.thru/cli/config.yaml` |
+### 📁 SDK Locations
 
-### Configuration
+```
+~/.thru/
+├── cli/
+│   └── config.yaml          # CLI configuration + keys
+├── sdk/
+│   ├── c/
+│   │   └── thru-sdk/        # C SDK files
+│   │       ├── include/      # Headers
+│   │       ├── lib/          # Libraries
+│   │       └── thru_c_program.mk  # Build rules
+│   └── toolchain/           # RISC-V compiler
+```
 
-Edit `~/.thru/cli/config.yaml`:
+<br>
+
+---
+
+## 🔧 Configuration
+
+<br>
+
+### CLI Config (`~/.thru/cli/config.yaml`)
 
 ```yaml
+# RPC endpoint (alphanet default)
 rpc_base_url: https://rpc.alphanet.thru.org
+
+# Keypairs (generated by `thru keys generate`)
+keys:
+  default:
+    public: tayzC11YgWrPpXBon_hBxI_...
+    private: <hex_encoded_private_key>  # ⚠️ NEVER SHARE
 ```
 
-Keypairs are stored as plaintext hex in the same config file. **Never share your private key.**
+<br>
+
+> ⚠️ **Security Warning**: Private keys are stored as plaintext hex. Never commit this file to version control.
+
+<br>
 
 ---
 
-## CLI Reference
+## 🚀 Program Development (C SDK)
 
-### Core Commands
+<br>
 
-| Command | Description |
-|---------|-------------|
-| `thru getversion` | Get node version |
-| `thru gethealth` | Health status |
-| `thru getstatus` | Node operational status (consensus, repair, heights) |
-| `thru getheight` | Cluster block heights |
-| `thru getaccountinfo` | Account information |
-| `thru getbalance` | Account balance |
-| `thru transfer` | Transfer tokens |
-| `thru keys generate` | Generate keypair |
-| `thru account create` | Create on-chain account |
+<table>
+<tr>
+<td width="50%">
 
-### Program Management
-
-| Command | Description |
-|---------|-------------|
-| `thru program create` | Upload & create managed program |
-| `thru program upgrade` | Upgrade existing program |
-| `thru program set-pause` | Pause/unpause program |
-| `thru program finalize` | Make program immutable |
-| `thru program destroy` | Destroy program |
-| `thru program derive-address` | Derive PDA address |
-| `thru program seed-to-hex` | Convert seed to hex |
-
-### ABI Management
-
-| Command | Description |
-|---------|-------------|
-| `thru abi account create` | Publish ABI to chain |
-| `thru abi account get` | Read ABI from chain |
-| `thru abi analyze` | Validate ABI locally |
-| `thru abi codegen` | Generate client code |
-| `thru abi reflect` | Decode binary payloads |
-
-### Transaction Commands
-
-| Command | Description |
-|---------|-------------|
-| `thru txn execute` | Execute transaction |
-| `thru txn make-state-proof` | Generate state proof |
-
-### Network & Token
-
-| Command | Description |
-|---------|-------------|
-| `thru network` | Network profile management |
-| `thru token` | Token program commands |
-| `thru faucet` | Faucet commands |
-| `thru registrar` | Registrar commands |
-| `thru nameservice` | Name service commands |
-| `thru wthru` | Wrapped Thru (WTHRU) commands |
-| `thru validator` | Validator program commands |
-
-### Utility
-
-| Command | Description |
-|---------|-------------|
-| `thru util` | Format conversion utilities |
-| `thru debug` | Transaction analysis |
-| `thru dev` | Developer tools (toolchain, SDK) |
-
----
-
-## Program Development (C SDK)
-
-### Project Structure
+### 📁 Project Structure
 
 ```
-my-thru-project/
+my-project/
 ├── GNUmakefile
 └── examples/
     ├── Local.mk
@@ -273,7 +282,34 @@ my-thru-project/
     └── my_program.c
 ```
 
-### GNUmakefile
+</td>
+<td width="50%">
+
+### 🔨 Build Commands
+
+```bash
+# Build program
+make
+
+# Verify output
+ls build/thruvm/bin/
+
+# Deploy to network
+thru program create my_seed \
+  ./build/thruvm/bin/my_program_c.bin
+
+# Upgrade existing
+thru program upgrade my_seed \
+  ./build/thruvm/bin/my_program_c.bin
+```
+
+</td>
+</tr>
+</table>
+
+<br>
+
+### 📄 GNUmakefile
 
 ```makefile
 BASEDIR:=$(CURDIR)/build
@@ -281,13 +317,15 @@ THRU_C_SDK_DIR:=$(HOME)/.thru/sdk/c/thru-sdk
 include $(THRU_C_SDK_DIR)/thru_c_program.mk
 ```
 
-### examples/Local.mk
+### 📄 examples/Local.mk
 
 ```makefile
 $(call make-bin,my_program_c,my_program,,-ltn_sdk)
 ```
 
-### Program Header (.h)
+<br>
+
+### 📝 Program Header (.h)
 
 ```c
 #ifndef MY_PROGRAM_H
@@ -311,7 +349,9 @@ typedef struct __attribute__((packed)) {
 #endif
 ```
 
-### Program Implementation (.c)
+<br>
+
+### 📝 Program Implementation (.c)
 
 ```c
 #include <thru-sdk/c/tn_sdk.h>
@@ -323,7 +363,7 @@ TSDK_ENTRYPOINT_FN void start(void) {
     uchar const *data = tsdk_txn_get_instr_data(txn);
     ulong data_sz = tsdk_txn_get_instr_data_sz(txn);
 
-    /* Validate input size */
+    /* Validate input */
     if (data_sz < sizeof(uint)) {
         tsdk_revert(MY_ERR_INVALID_DATA);
     }
@@ -333,19 +373,17 @@ TSDK_ENTRYPOINT_FN void start(void) {
     switch (*instr_type) {
         case MY_INSTRUCTION_INIT: {
             ushort account_idx = *(ushort *)(data + sizeof(uint));
-            
-            /* Create account */
+
+            /* Create account with state proof */
             ulong result = tsys_account_create(account_idx, seed, proof, proof_sz);
             if (result != TSDK_SUCCESS) tsdk_revert(MY_ERR_CREATE_FAILED);
-            
-            /* Set writable */
+
+            /* Initialize */
             tsys_set_account_data_writable(account_idx);
-            
-            /* Resize and initialize */
             tsys_account_resize(account_idx, sizeof(my_account_t));
             my_account_t *acct = (my_account_t *)tsdk_get_account_data_ptr(account_idx);
             acct->value = 0;
-            
+
             tsdk_return(TSDK_SUCCESS);
             break;
         }
@@ -354,6 +392,8 @@ TSDK_ENTRYPOINT_FN void start(void) {
             tsys_set_account_data_writable(account_idx);
             my_account_t *acct = (my_account_t *)tsdk_get_account_data_ptr(account_idx);
             acct->value++;
+
+            /* Emit event */
             tsys_emit_event((uchar const *)&acct->value, sizeof(ulong));
             tsdk_return(TSDK_SUCCESS);
             break;
@@ -364,45 +404,46 @@ TSDK_ENTRYPOINT_FN void start(void) {
 }
 ```
 
-### Build & Deploy
+<br>
 
-```bash
-# Build
-make
-
-# Verify
-ls build/thruvm/bin/
-
-# Deploy
-thru program create my_seed ./build/thruvm/bin/my_program_c.bin
-
-# Upgrade (same seed)
-thru program upgrade my_seed ./build/thruvm/bin/my_program_c.bin
-```
-
-### Key SDK Functions
+### 🔑 Key SDK Functions
 
 | Function | Description |
 |----------|-------------|
 | `tsdk_get_txn()` | Get current transaction |
-| `tsdk_txn_get_instr_data()` | Get instruction data |
-| `tsdk_get_account_data_ptr()` | Get account data pointer |
-| `tsdk_return(TSDK_SUCCESS)` | Exit successfully |
-| `tsdk_revert(error_code)` | Exit with error |
-| `tsys_account_create()` | Create new account |
-| `tsys_account_resize()` | Resize account data |
-| `tsys_set_account_data_writable()` | Mark account writable |
-| `tssys_account_compress()` | Compress account (save storage) |
+| `tsdk_txn_get_instr_data()` | Get instruction data bytes |
+| `tsdk_get_account_data_ptr()` | Get pointer to account data |
+| `tsdk_return(TSDK_SUCCESS)` | Exit program successfully |
+| `tsdk_revert(error_code)` | Exit with error (revert) |
+| `tsys_account_create()` | Create new on-chain account |
+| `tsys_account_resize()` | Resize account data buffer |
+| `tsys_set_account_data_writable()` | Mark account as writable |
+| `tsys_account_compress()` | Compress account (save storage) |
 | `tsys_account_decompress()` | Decompress account |
-| `tsys_emit_event()` | Emit event |
+| `tsys_emit_event()` | Emit event to chain |
+
+<br>
 
 ---
 
-## ABI System
+## 📋 ABI System
 
-ABI (Application Binary Interface) on Thru defines the binary data layout for instructions and account state.
+<br>
 
-### ABI YAML Structure
+<details>
+<summary><b>📖 What is ABI?</b></summary>
+
+ABI (Application Binary Interface) defines the binary data layout for:
+- **Instructions** — what operations programs accept
+- **Account State** — how data is stored on-chain
+
+ABIs on Thru are **handwritten YAML files** that must be validated before publishing.
+
+</details>
+
+<br>
+
+### 📝 ABI YAML Structure
 
 ```yaml
 abi:
@@ -432,101 +473,208 @@ types:
             field-type:
               enum:
                 packed: true
+                variants:
+                  - name: Init
+                    fields:
+                      - name: seed
+                        field-type:
+                          primitive: u8
+                  - name: Update
+                    fields:
+                      - name: value
+                        field-type:
+                          primitive: u64
 ```
 
-### ABI Workflow
+<br>
 
-1. **Author** — Write ABI YAML by hand (start from examples)
-2. **Validate** — `thru abi analyze ./program.abi.yaml`
-3. **Codegen** — `thru abi codegen --files ./program.abi.yaml --language typescript --output ./generated/`
-4. **Publish** — `thru abi account create my_seed ./program.abi.yaml`
-5. **Verify** — `thru abi account get --include-data <ABI_ADDRESS>`
+### 🔄 ABI Workflow
 
-### ABI Gotchas
+```
+┌─────────┐     ┌──────────┐     ┌──────────┐     ┌──────────┐
+│  Write  │ ──▶ │ Validate │ ──▶ │  Codegen │ ──▶ │ Publish  │
+│  YAML   │     │  Analyze │     │  TS/C/Rs │     │  On-Chain│
+└─────────┘     └──────────┘     └──────────┘     └──────────┘
+```
 
-- ABIs are **handwritten** — they don't auto-sync with program changes
-- Always validate before publishing
-- Use `__attribute__((packed))` in C structs
-- Use `options.program-metadata.root-types` for explorer compatibility
-- Match program seed between `thru program create` and `thru abi account create`
+```bash
+# 1. Validate ABI
+thru abi analyze ./program.abi.yaml
+
+# 2. Generate client code
+thru abi codegen \
+  --files ./program.abi.yaml \
+  --language typescript \
+  --output ./generated/
+
+# 3. Publish to chain
+thru abi account create my_seed ./program.abi.yaml
+
+# 4. Verify published ABI
+thru abi account get --include-data <ABI_ADDRESS>
+```
+
+<br>
 
 ---
 
-## Core Concepts
+## 🧠 Core Concepts
 
-### Account Model
+<br>
 
-Every piece of state on Thru is an **account**. Accounts have:
-- **Address** — unique identifier (starts with `ta`)
-- **Data** — binary payload (program code or state)
-- **Owner** — program that owns the account
-- **Flags** — compressed, writable, etc.
+### 🏦 Account Model
 
-### Program-Derived Addresses (PDAs)
+<table>
+<tr>
+<td width="50%">
 
-Accounts can be deterministically derived from a program + seed:
+**Every piece of state is an Account**
+
+| Property | Description |
+|----------|-------------|
+| **Address** | Unique ID (starts with `ta`) |
+| **Data** | Binary payload |
+| **Owner** | Controlling program |
+| **Flags** | Compressed, writable, etc. |
+
+</td>
+<td width="50%">
+
+**Account Lifecycle**
+
+```
+    ┌─────────┐
+    │ Create  │
+    └────┬────┘
+         ▼
+    ┌─────────┐
+    │ Active  │ ◄──────────────┐
+    └────┬────┘                │
+         │                     │
+         ▼                     │
+    ┌──────────┐          ┌────┴─────┐
+    │ Compress │          │Decompress│
+    └──────────┘          └──────────┘
+         │
+         ▼
+    ┌─────────┐
+    │ Archive │
+    └─────────┘
+```
+
+</td>
+</tr>
+</table>
+
+<br>
+
+### 🔑 Program-Derived Addresses (PDAs)
+
+Accounts can be **deterministically derived** from a program + seed:
 
 ```bash
+# Derive address
 thru program derive-address <program_address> <seed>
+
+# Convert seed to hex
+thru program seed-to-hex <seed>
 ```
 
-Same seed always produces the same address — no on-chain lookup needed.
+> 💡 Same seed always produces the same address — no on-chain lookup needed
 
-### State Proofs
+<br>
 
-When creating or modifying accounts, cryptographic state proofs verify the account's existence in the Merkle tree:
+### 📜 State Proofs
+
+Cryptographic proofs verify account existence in the Merkle tree:
 
 ```bash
+# Generate proof for account creation
 thru txn make-state-proof creating <account_address>
+
+# Proof types
+# ├── creating   — prove account doesn't exist yet
+# ├── existing   — prove account exists (for decompress)
+# └── updating   — prove account state (for re-compress)
 ```
 
-Proof types: `creating`, `existing`, `updating`
+<br>
 
-### Transactions
+### 📨 Transaction Structure
 
-A transaction contains:
-1. **Fee payer** (index 0) — pays for execution
-2. **Program** (index 1) — the code to execute
-3. **Writable accounts** (index 2+) — accounts the program can modify
-4. **Read-only accounts** — accounts the program can only read
-5. **Instruction data** — hex-encoded payload
+```
+┌─────────────────────────────────────────┐
+│  0: Fee Payer       (pays for execution)│
+│  1: Program         (code to execute)   │
+│  2+: Writable Accts (can modify)        │
+│  N+: Read-only Accts (can only read)    │
+└─────────────────────────────────────────┘
+```
 
 ```bash
 thru txn execute \
   --fee 0 \
-  --readwrite-accounts <account_address> \
+  --readwrite-accounts <writable_account> \
   <program_address> \
   <hex_instruction_data>
 ```
 
-### Compute Units (CUs)
+<br>
 
-Each transaction consumes compute units based on:
-- Instructions executed
-- Memory used
-- Account storage consumed
+### 💰 Compute Units (CUs)
 
-Max CUs per transaction limits program complexity.
+Each transaction consumes compute units:
+
+| Resource | CU Cost |
+|----------|---------|
+| Base transaction | 500 |
+| Per instruction | Varies |
+| Memory allocation | Per page |
+| Account creation | Per account |
+
+<br>
 
 ---
 
-## Virtual Machine (ThruVM)
+## ⚙️ Virtual Machine (ThruVM)
 
-### RISC-V Architecture
+<br>
 
-ThruVM implements a **64-bit RISC-V** virtual machine:
+<table>
+<tr>
+<td width="50%">
+
+### 🔧 RISC-V Extensions
 
 | Extension | Purpose |
 |-----------|---------|
-| **RV64I** | Base integer instructions (arithmetic, logic, control flow) |
-| **M** | Integer multiplication/division |
-| **C** | Compressed 16-bit instructions (smaller code) |
-| **B** | Bit manipulation (count, rotate, permute) |
-| **Zknh** | Cryptographic hash acceleration (SHA-256, SHA-512) |
+| **RV64I** | Base integer (64-bit) |
+| **M** | Multiply/divide |
+| **C** | Compressed instructions (16-bit) |
+| **B** | Bit manipulation |
+| **Zknh** | SHA-256/512 acceleration |
 
-### Memory Layout
+</td>
+<td width="50%">
 
-48-bit segmented address space:
+### 📐 Key Constraints
+
+| Constraint | Value |
+|------------|-------|
+| IALIGN | 16-bit |
+| Page Size | 4KB |
+| Max Stack | 16MB |
+| Max Heap | 16MB |
+| Threads | Single |
+| Alignment | Strict |
+
+</td>
+</tr>
+</table>
+
+<br>
+
+### 🧮 Memory Layout (48-bit Segmented)
 
 ```
 Bits: 47-40  |  39-24   |  23-0
@@ -534,304 +682,239 @@ Bits: 47-40  |  39-24   |  23-0
     (8 bits) |(16 bits) |(24 bits)
 ```
 
-| Segment Type | Name | Purpose |
-|-------------|------|---------|
-| 0x00 | Read-Only | Transaction data, shadow stack, program bytecode, block context |
-| 0x02 | Account Metadata | Account metadata structures |
-| 0x03 | Account Data | Page-based account data (COW) |
-| 0x04 | Event Data | Event emission buffer |
-| 0x05 | Stack | Grows downward (16MB max) |
-| 0x07 | Heap | Grows upward (16MB max) |
+| Type | Name | Purpose |
+|------|------|---------|
+| `0x00` | Read-Only | TXN data, program code, block context |
+| `0x02` | Account Meta | Account metadata |
+| `0x03` | Account Data | Page-based data (COW) |
+| `0x04` | Events | Event emission buffer |
+| `0x05` | Stack | Grows ↓ (16MB) |
+| `0x07` | Heap | Grows ↑ (16MB) |
 
-### Executable Format
+<br>
+
+### 📦 Executable Format
 
 ```
-┌──────────┐
-│ Header   │  8 bytes (magic + version + size)
-├──────────┤
-│ Bytecode │  RISC-V instructions
-├──────────┤
-│ Footer   │  4 bytes (checksum)
-└──────────┘
+┌──────────────┐
+│   Header     │  8 bytes (magic + version + size)
+├──────────────┤
+│   Bytecode   │  RISC-V instructions
+├──────────────┤
+│   Footer     │  4 bytes (checksum)
+└──────────────┘
 ```
 
-### Key Constraints
-
-- **IALIGN=16** — all instructions aligned to 16-bit boundaries
-- **No unaligned access** — triggers exception
-- **Single-threaded** — deterministic execution
-- **4KB pages** — memory allocated in 4KB chunks
-- **Copy-on-Write** — account data uses COW semantics
+<br>
 
 ---
 
-## Runtime & Execution
+## 🔄 Runtime & Execution
 
-### Transaction Execution Flow
+<br>
 
-1. Deserialize transaction
-2. Validate accounts and signatures
-3. Set up VM memory segments
-4. Execute program bytecode
-5. Apply state changes (or revert on error)
-6. Emit events
-7. Commit to state tree
+### 📊 Execution Flow
 
-### Syscalls
+```
+┌─────────────┐
+│  Deserialize│
+│  Transaction│
+└──────┬──────┘
+       ▼
+┌─────────────┐
+│   Validate  │
+│   Accounts  │
+└──────┬──────┘
+       ▼
+┌─────────────┐
+│  Setup VM   │
+│  Memory     │
+└──────┬──────┘
+       ▼
+┌─────────────┐
+│   Execute   │
+│  Bytecode   │
+└──────┬──────┘
+       ▼
+┌─────────────┐
+│   Apply/    │
+│   Revert    │
+└──────┬──────┘
+       ▼
+┌─────────────┐
+│   Commit    │
+│   State     │
+└─────────────┘
+```
 
-Programs interact with the runtime via syscalls:
+<br>
+
+### 📞 System Calls
 
 | Code | Syscall | Description |
 |------|---------|-------------|
-| 0x01 | `account_create` | Create new account |
-| 0x02 | `account_resize` | Resize account data |
-| 0x03 | `account_delete` | Delete account |
-| 0x04 | `account_compress` | Compress account |
-| 0x05 | `account_decompress` | Decompress account |
-| 0x06 | `emit_event` | Emit event |
-| 0x07 | `exit` | Exit program |
-| 0x08 | `invoke` | Call another program (CPI) |
-| 0x09 | `log` | Log message |
-| 0x0A | `set_account_data_writable` | Mark account writable |
+| `0x01` | `account_create` | Create new account |
+| `0x02` | `account_resize` | Resize account data |
+| `0x03` | `account_delete` | Delete account |
+| `0x04` | `account_compress` | Compress account |
+| `0x05` | `account_decompress` | Decompress account |
+| `0x06` | `emit_event` | Emit event |
+| `0x07` | `exit` | Exit program |
+| `0x08` | `invoke` | Call another program (CPI) |
+| `0x09` | `log` | Log message |
+| `0x0A` | `set_writable` | Mark account writable |
 
-### Error Handling
-
-Programs use:
-- `tsdk_return(TSDK_SUCCESS)` — success
-- `tsdk_revert(error_code)` — revert with custom error code
-
-On revert, all state changes are rolled back.
+<br>
 
 ---
 
-## Accounts & State
+## 🏦 Accounts & State
 
-### Account Lifecycle
+<br>
 
-```
-Create → Active → Compress → (stored off-chain)
-              ↓                ↓
-          Decompress ←←←←←←←←←←
-              ↓
-          Active → Delete
-```
-
-### Account Compression
-
-Accounts can be **compressed** to save validator storage:
-- Data removed from active storage
-- State committed to Merkle tree
-- Decompress with state proof when needed
+### 🗜️ Account Compression
 
 ```c
-// Compress
+// Compress account (archive to Merkle tree)
 tsys_account_compress(account_idx, proof, proof_sz);
 
-// Decompress
+// Decompress account (restore from proof)
 tsys_account_decompress(account_idx, proof, proof_sz);
 ```
 
-### Account Addresses
+| State | Storage | Access |
+|-------|---------|--------|
+| **Uncompressed** | Validator memory | Direct |
+| **Compressed** | Off-chain (Merkle) | Via proof |
 
-Thru addresses start with `ta` and are base64url-encoded. Two account types:
-- **Regular accounts** — created with `thru account create`
-- **Program accounts** — created with `thru program create`
+<br>
 
 ---
 
-## SDKs & Packages
+## 📦 SDKs & Packages
 
-### NPM Packages
+<br>
 
-| Package | Description |
-|---------|-------------|
-| `@thru/sdk` | TypeScript/JS client — blocks, accounts, transactions, events, proofs |
-| `@thru/programs` | Token program bindings — create/manage tokens |
-| `@thru/passkey` | WebAuthn/passkey signing helpers |
-| `@thru/indexer` | Drizzle-backed indexer framework |
-| `@thru/replay` | Historical + live chain data replay |
+### 🟢 NPM Packages
 
-### Rust Crates
-
-| Crate | Description |
-|-------|-------------|
-| `thru-base` | Core Rust primitives, transaction builders, crypto helpers |
-| `thru-grpc-client` | Generated gRPC bindings (tonic + prost) |
-| `thru` | CLI implementation |
-
-### Install
+<table>
+<tr>
+<td>
 
 ```bash
-# NPM
-npm i @thru/sdk @thru/programs @thru/passkey
-
-# Rust
-cargo add thru-base thru-grpc-client
+npm i @thru/sdk
 ```
+
+**`@thru/sdk`** — TypeScript/JS client
+- Blocks, accounts, transactions
+- Events, proofs
+- Typed domain models
+
+</td>
+<td>
+
+```bash
+npm i @thru/programs
+```
+
+**`@thru/programs`** — On-chain programs
+- Token program bindings
+- Instruction builders
+- Address derivation
+
+</td>
+<td>
+
+```bash
+npm i @thru/passkey
+```
+
+**`@thru/passkey`** — Passkey/WebAuthn
+- Registration & signing
+- Mobile helpers
+- Auth flows
+
+</td>
+</tr>
+<tr>
+<td>
+
+```bash
+npm i @thru/indexer
+```
+
+**`@thru/indexer`** — Indexer framework
+- Drizzle-backed
+- Stream definitions
+- Background indexing
+
+</td>
+<td>
+
+```bash
+npm i @thru/replay
+```
+
+**`@thru/replay`** — Chain replay
+- Historical backfill
+- Live streaming
+- No gaps/duplicates
+
+</td>
+<td>
+
+```bash
+# Rust crates
+cargo add thru-base
+cargo add thru-grpc-client
+```
+
+**Rust SDKs**
+- `thru-base` — Core primitives
+- `thru-grpc-client` — gRPC bindings
+
+</td>
+</tr>
+</table>
+
+<br>
 
 ---
 
-## APIs
+## 🔌 APIs
 
-### gRPC API (Recommended for Performance)
+<br>
 
-- **Protocol Buffers** serialization (2-10x smaller than JSON)
-- **Streaming** support (server-streaming, bidirectional)
-- **Binary** encoding for efficiency
+### ⚡ gRPC API (Recommended)
 
-**Endpoint:** `https://grpc.alphanet.thru.org`
+High-performance Protocol Buffers API:
 
-**Services:**
+```text
+Endpoint: https://grpc.alphanet.thru.org
+```
 
 | Service | Purpose |
 |---------|---------|
-| `CommandService` | Send transactions, batch send, send-and-track |
-| `QueryService` | Get blocks, transactions, accounts, events, state roots |
-| `StreamingService` | Stream blocks, transactions, events, account updates |
-| `DebugService` | Re-execute transactions for debugging |
+| **CommandService** | Send transactions, batch operations |
+| **QueryService** | Get blocks, accounts, transactions |
+| **StreamingService** | Real-time streams |
+| **DebugService** | Transaction debugging |
 
-### REST/JSON API
+<br>
 
-For browser and simple integrations. Same data, JSON format.
+### 🌐 REST API
 
-**Endpoint:** `https://rpc.alphanet.thru.org`
+Browser-friendly JSON API:
 
-### Explorer MCP
-
-Live chain context for AI coding agents:
-
-```
-https://scan.thru.org/api/mcp
+```text
+Endpoint: https://rpc.alphanet.thru.org
 ```
 
-Add to Claude Code:
-```bash
-claude mcp add --transport http thru-explorer https://scan.thru.org/api/mcp
-```
+<br>
 
-**Tools:** `get_block`, `get_transaction`, `get_account`, `list_recent_blocks`, `list_recent_transactions`, `search`, `get_program_abi`
+### 🤖 Explorer MCP (AI Agents)
 
----
-
-## Wallet & Passkey
-
-### Passkey Manager Program
-
-On-chain program for WebAuthn/passkey-backed authorization.
-
-**How it works:**
-1. User registers passkey (WebAuthn credential)
-2. For each transaction, program builds a challenge from wallet nonce + accounts + instructions
-3. User signs challenge with passkey
-4. Program verifies WebAuthn signature
-
-**Key accounts:**
-- `WalletAccount` — wallet state and nonce
-- `CredentialLookup` — passkey credential mapping
-
-### SDK Packages
-
-```bash
-npm i @thru/passkey @thru/programs
-```
-
-| Package | Use Case |
-|---------|----------|
-| `@thru/passkey` | Browser WebAuthn registration, signing, mobile helpers |
-| `@thru/programs/passkey-manager` | Build validate/transfer/invoke instructions |
-
-### Scoped Approvals (New)
-
-Wallet signing sessions with scoped approvals — authorize specific actions per session instead of signing every transaction individually.
-
----
-
-## Token Program
-
-Fungible token management on Thru.
-
-**Core accounts:**
-- `TokenMintAccount` — mint metadata and supply
-- `TokenAccount` — individual token balance
-
-**Instructions:**
-
-| Instruction | Description |
-|-------------|-------------|
-| `initialize_mint` | Create new token mint |
-| `initialize_account` | Create token account |
-| `transfer` | Transfer tokens |
-| `mint_to` | Mint new tokens |
-| `burn` | Burn tokens |
-| `close_account` | Close token account |
-| `freeze_account` | Freeze account |
-| `thaw_account` | Unfreeze account |
-
----
-
-## NFT Program
-
-Non-fungible token management.
-
-**Core accounts:**
-- `NftMintAccount` — mint metadata and supply
-- `NftAccount` — individual NFT data
-
-**Instructions:**
-
-| Instruction | Description |
-|-------------|-------------|
-| `initialize_mint` | Create NFT mint |
-| `mint_to` | Mint new NFT |
-| `transfer` | Transfer NFT ownership |
-| `burn` | Burn NFT |
-| `update_metadata` | Update NFT metadata |
-
----
-
-## Core Specifications
-
-### Transaction Format
-
-```
-┌─────────────────────────┐
-│ Signatures              │
-├─────────────────────────┤
-│ Message                 │
-│  ├─ Header              │
-│  ├─ Account Addresses   │
-│  ├─ Recent Block Hash   │
-│  └─ Instructions        │
-└─────────────────────────┘
-```
-
-### Block Structure
-
-- **Slot** — time-based execution window
-- **Block** —集合 of transactions in a slot
-- **Block Hash** — hash of block content
-- **State Root** — Merkle root of all account state
-
-### State Tree
-
-Merkle tree of all account states. Used for:
-- State proofs (prove account existence/value)
-- Compression (archive old state)
-- Light client verification
-
----
-
-## Building with AI Agents
-
-### Install Thru Skills
-
-```bash
-npx skills add Unto-Labs/ai
-```
-
-This installs `thru-best-practices` — the recommended skill for agent-driven Thru development.
-
-### Explorer MCP Setup
+Live chain context for coding agents:
 
 ```bash
 # Claude Code
@@ -844,108 +927,311 @@ claude mcp add --transport http thru-explorer https://scan.thru.org/api/mcp
 #     url: https://scan.thru.org/api/mcp
 ```
 
-### Agent Development Pattern
+**Available Tools:**
 
-1. **Understand** — Read docs, explore chain state via MCP
-2. **Plan** — Design program structure and instruction set
-3. **Build** — Write C code, compile to RISC-V
-4. **Validate** — Check ABI, test locally
-5. **Deploy** — Upload to alphanet
-6. **Debug** — Use explorer MCP to inspect transactions
-7. **Iterate** — Upgrade program, re-validate
+| Tool | Description |
+|------|-------------|
+| `get_block` | Fetch block details |
+| `get_transaction` | Fetch transaction details |
+| `get_account` | Fetch account state |
+| `list_recent_blocks` | Recent blocks |
+| `list_recent_transactions` | Recent transactions |
+| `search` | Search chain state |
+| `get_program_abi` | Fetch program ABI |
+
+<br>
 
 ---
 
-## Useful Commands Cheat Sheet
+## 🔐 Wallet & Passkey
 
-### Quick Reference
+<br>
+
+### 🛡️ Passkey Manager Program
+
+On-chain program for WebAuthn/passkey authorization:
+
+```
+┌─────────────────────────────────────────────┐
+│              Passkey Flow                    │
+├─────────────────────────────────────────────┤
+│  1. Register passkey (WebAuthn credential)  │
+│  2. Build challenge (nonce + accounts +     │
+│     instructions)                           │
+│  3. Sign with passkey (user device)         │
+│  4. Verify on-chain (program)               │
+└─────────────────────────────────────────────┘
+```
+
+| Account | Purpose |
+|---------|---------|
+| `WalletAccount` | Wallet state + nonce |
+| `CredentialLookup` | Passkey credential mapping |
+
+<br>
+
+### 🔑 Scoped Approvals (New)
+
+Wallet signing sessions with scoped approvals:
+- Authorize **specific actions** per session
+- Don't need to sign **every transaction**
+- Better UX for repeated operations
 
 ```bash
-# Setup
-thru --help
-thru getversion
-thru gethealth
+npm i @thru/passkey @thru/programs
+```
 
-# Keys
-thru keys generate <name>
-thru keys list
+<br>
 
-# Accounts
-thru account create <name>
-thru getbalance <address>
-thru getaccountinfo <address>
+---
 
-# Programs
-thru program create <seed> <binary_path>
-thru program upgrade <seed> <binary_path>
-thru program derive-address <program_addr> <seed>
-thru program seed-to-hex <seed>
+## 🪙 Token Program
 
-# ABI
-thru abi analyze <abi.yaml>
-thru abi codegen --files <abi.yaml> --language typescript --output ./gen/
-thru abi account create <seed> <abi.yaml>
-thru abi account get --include-data <address>
+<br>
 
-# Transactions
-thru txn execute --fee 0 --readwrite-accounts <acct> <program> <hex_data>
-thru txn make-state-proof creating <address>
+### 📊 Token Accounts
 
-# Tokens
+| Account | Purpose |
+|---------|---------|
+| `TokenMintAccount` | Mint metadata + supply |
+| `TokenAccount` | Individual balance |
+
+### 📝 Instructions
+
+| Instruction | Description |
+|-------------|-------------|
+| `initialize_mint` | Create new token mint |
+| `initialize_account` | Create token account |
+| `transfer` | Transfer tokens |
+| `mint_to` | Mint new tokens |
+| `burn` | Burn tokens |
+| `close_account` | Close token account |
+| `freeze_account` | Freeze account |
+| `thaw_account` | Unfreeze account |
+
+<br>
+
+---
+
+## 🎨 NFT Program
+
+<br>
+
+### 📊 NFT Accounts
+
+| Account | Purpose |
+|---------|---------|
+| `NftMintAccount` | Mint metadata + supply |
+| `NftAccount` | Individual NFT data |
+
+### 📝 Instructions
+
+| Instruction | Description |
+|-------------|-------------|
+| `initialize_mint` | Create NFT mint |
+| `mint_to` | Mint new NFT |
+| `transfer` | Transfer NFT ownership |
+| `burn` | Burn NFT |
+| `update_metadata` | Update NFT metadata |
+
+<br>
+
+---
+
+## 🤖 Building with AI Agents
+
+<br>
+
+### 📦 Install Thru Skills
+
+```bash
+npx skills add Unto-Labs/ai
+```
+
+This installs `thru-best-practices` — recommended for agent-driven development.
+
+<br>
+
+### 🔄 Agent Development Pattern
+
+```
+┌─────────────┐
+│  1. UNDERSTAND │  Read docs, explore chain via MCP
+└──────┬──────┘
+       ▼
+┌─────────────┐
+│  2. PLAN     │  Design program + instructions
+└──────┬──────┘
+       ▼
+┌─────────────┐
+│  3. BUILD    │  Write C code, compile to RISC-V
+└──────┬──────┘
+       ▼
+┌─────────────┐
+│  4. VALIDATE │  Check ABI, test locally
+└──────┬──────┘
+       ▼
+┌─────────────┐
+│  5. DEPLOY   │  Upload to alphanet
+└──────┬──────┘
+       ▼
+┌─────────────┐
+│  6. DEBUG    │  Inspect via Explorer MCP
+└──────┬──────┘
+       ▼
+┌─────────────┐
+│  7. ITERATE  │  Upgrade, re-validate
+└─────────────┘
+```
+
+<br>
+
+---
+
+## 📚 Useful Commands
+
+<br>
+
+### 🔍 Quick Reference
+
+<details>
+<summary><b>🚀 Setup & Status</b></summary>
+
+```bash
+thru --help                  # Show all commands
+thru getversion              # Node version
+thru gethealth               # Health status
+thru getstatus               # Operational status
+thru getheight               # Block heights
+```
+
+</details>
+
+<details>
+<summary><b>🔑 Keys & Accounts</b></summary>
+
+```bash
+thru keys generate <name>    # Generate keypair
+thru keys list               # List keypairs
+thru account create <name>   # Create account
+thru getbalance <address>    # Check balance
+thru getaccountinfo <addr>   # Account details
+thru transfer <to> <amount>  # Transfer tokens
+```
+
+</details>
+
+<details>
+<summary><b>📦 Programs</b></summary>
+
+```bash
+thru program create <seed> <binary>        # Deploy
+thru program upgrade <seed> <binary>       # Upgrade
+thru program set-pause <seed> true         # Pause
+thru program finalize <seed>               # Make immutable
+thru program destroy <seed>                # Destroy
+thru program derive-address <prog> <seed>  # Derive PDA
+thru program seed-to-hex <seed>            # Seed to hex
+```
+
+</details>
+
+<details>
+<summary><b>📋 ABI</b></summary>
+
+```bash
+thru abi analyze <abi.yaml>               # Validate
+thru abi codegen --files <abi.yaml> \     # Generate code
+  --language typescript \
+  --output ./gen/
+thru abi account create <seed> <abi.yaml>  # Publish
+thru abi account get --include-data <addr> # Read
+```
+
+</details>
+
+<details>
+<summary><b>📨 Transactions</b></summary>
+
+```bash
+thru txn execute \                         # Execute
+  --fee 0 \
+  --readwrite-accounts <acct> \
+  <program> \
+  <hex_data>
+
+thru txn make-state-proof creating <addr>  # Generate proof
+```
+
+</details>
+
+<details>
+<summary><b>🪙 Tokens</b></summary>
+
+```bash
 thru token transfer <from> <to> <amount>
 thru token balance <address>
-
-# Network
-thru network list
-thru network use <name>
-
-# Faucet
-thru faucet request <name>
-
-# Dev Tools
-thru dev toolchain install
-thru dev sdk install c
-
-# Debug
-thru debug re-execute <txn_signature>
+thru token mint <mint> <to> <amount>
+thru token burn <account> <amount>
 ```
 
-### Program Interaction Flow
+</details>
+
+<details>
+<summary><b>🛠️ Dev Tools</b></summary>
 
 ```bash
-# 1. Derive account address
-thru program derive-address <program> my_counter
-
-# 2. Generate state proof
-thru txn make-state-proof creating <derived_address>
-
-# 3. Construct instruction data (hex)
-# instruction_type(4) + account_index(2) + seed(32) + proof_size(4) + proof
-
-# 4. Execute
-thru txn execute \
-  --fee 0 \
-  --readwrite-accounts <derived_address> \
-  <program_address> \
-  <hex_instruction_data>
+thru dev toolchain install  # Install RISC-V toolchain
+thru dev sdk install c      # Install C SDK
+thru network list           # List networks
+thru network use <name>     # Switch network
+thru faucet request <name>  # Get testnet tokens
 ```
 
+</details>
+
+<br>
+
 ---
 
-## Resources
+## 🔗 Resources
 
-| Resource | URL |
-|----------|-----|
+<br>
+
+<table>
+<tr>
+<td width="50%">
+
+### 📖 Official
+
+| Resource | Link |
+|----------|------|
 | Documentation | [docs.thru.org](https://docs.thru.org) |
-| GitHub | [github.com/Unto-Labs/thru](https://github.com/Unto-Labs/thru) |
+| GitHub | [Unto-Labs/thru](https://github.com/Unto-Labs/thru) |
 | Explorer | [scan.thru.org](https://scan.thru.org) |
-| RPC Endpoint | `https://rpc.alphanet.thru.org` |
-| gRPC Endpoint | `https://grpc.alphanet.thru.org` |
-| AI Skills | [github.com/Unto-Labs/ai](https://github.com/Unto-Labs/ai) |
-| LLM-Friendly Docs | [docs.thru.org/llms-full.txt](https://docs.thru.org/llms-full.txt) |
+| AI Skills | [Unto-Labs/ai](https://github.com/Unto-Labs/ai) |
+| LLM Docs | [llms-full.txt](https://docs.thru.org/llms-full.txt) |
+
+</td>
+<td width="50%">
+
+### 🔌 Endpoints
+
+| Service | URL |
+|---------|-----|
+| RPC | `https://rpc.alphanet.thru.org` |
+| gRPC | `https://grpc.alphanet.thru.org` |
+| Explorer MCP | `https://scan.thru.org/api/mcp` |
+
+</td>
+</tr>
+</table>
+
+<br>
 
 ---
 
-## License
-
-See [LICENSE](LICENSE) for details.
+<p align="center">
+  <b>Built with ⚡ for the Thru Alphanet</b><br>
+  <sub>Last updated: July 2026</sub>
+</p>
