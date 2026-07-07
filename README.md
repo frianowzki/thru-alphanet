@@ -1,6 +1,6 @@
 <p align="center">
   <img src="https://img.shields.io/badge/status-alphanet-yellow?style=for-the-badge&labelColor=1a1a2e" alt="Status">
-  <img src="https://img.shields.io/badge/thru-v0.2.27-blue?style=for-the-badge&labelColor=1a1a2e" alt="Version">
+  <img src="https://img.shields.io/badge/thru-v0.2.38-blue?style=for-the-badge&labelColor=1a1a2e" alt="Version">
   <img src="https://img.shields.io/badge/RISC--V-64--bit-orange?style=for-the-badge&labelColor=1a1a2e" alt="VM">
   <img src="https://img.shields.io/badge/license-MIT-green?style=for-the-badge&labelColor=1a1a2e" alt="License">
 </p>
@@ -70,6 +70,7 @@
 <summary><b>📦 On-Chain Programs</b></summary>
 
 - [Token Program](#-token-program)
+- [Token Program Flow (FRIO Example)](#-token-program-flow-frio-example)
 - [NFT Program](#-nft-program)
 
 </details>
@@ -173,7 +174,6 @@ thru faucet request default
 | **npm** | `npm i -g thru` |
 | **deb** | `apt install ./thru_*.deb` |
 | **rpm** | `dnf install ./thru-*.rpm` |
-| **cargo** | `cargo install thru` |
 
 <br>
 
@@ -992,23 +992,196 @@ npm i @thru/passkey @thru/programs
 
 ### 📊 Token Accounts
 
-| Account | Purpose |
-|---------|---------|
-| `TokenMintAccount` | Mint metadata + supply |
-| `TokenAccount` | Individual balance |
+| Account | Size | Purpose |
+|---------|------|---------|
+| `TokenMintAccount` | 115 bytes | Mint metadata + supply |
+| `TokenAccount` | 73 bytes | Individual balance |
 
 ### 📝 Instructions
 
-| Instruction | Description |
-|-------------|-------------|
-| `initialize_mint` | Create new token mint |
-| `initialize_account` | Create token account |
-| `transfer` | Transfer tokens |
-| `mint_to` | Mint new tokens |
-| `burn` | Burn tokens |
-| `close_account` | Close token account |
-| `freeze_account` | Freeze account |
-| `thaw_account` | Unfreeze account |
+| Tag | Instruction | Description |
+|-----|-------------|-------------|
+| `0` | `initialize_mint` | Create new token mint |
+| `1` | `initialize_account` | Create token account |
+| `2` | `transfer` | Transfer tokens |
+| `3` | `mint_to` | Mint new tokens |
+| `4` | `burn` | Burn tokens |
+| `5` | `close_account` | Close token account |
+| `6` | `freeze_account` | Freeze account |
+| `7` | `thaw_account` | Unfreeze account |
+
+<br>
+
+### ⚠️ Known Limitations
+
+| Feature | Status | Notes |
+|---------|--------|-------|
+| `set_authority` | ❌ Not implemented | On-chain program doesn't support |
+| `revoke_authority` | ❌ Not implemented | On-chain program doesn't support |
+| Multi-sig | ❌ Not implemented | — |
+
+> These features exist in SPL Token (Solana) but are **not yet implemented** in Thru's token program.
+
+<br>
+
+---
+
+## 🪙 Token Program Flow (FRIO Example)
+
+<br>
+
+Complete walkthrough of creating, transferring, burning, and freezing a token.
+
+### 1️⃣ Create Mint
+
+```bash
+# Generate seed
+SEED=$(python3 -c "import secrets; print(secrets.token_hex(32))")
+
+# Create mint (9 decimals, with freeze authority)
+thru token initialize-mint \
+  <CREATOR_ADDRESS> \
+  FRIO \
+  $SEED \
+  --decimals 9 \
+  --freeze-authority <FREEZE_AUTHORITY_ADDRESS> \
+  --json
+```
+
+**Response:**
+```json
+{
+  "token_initialize_mint": {
+    "status": "success",
+    "mint_account": "ta5YmaFApl_3d8d92gVRPVNCZldHxUtgXMTKPYCeTbc-4o",
+    "ticker": "FRIO",
+    "decimals": 9,
+    "creator": "ta4xUEvMgPYGUiCrbX0az58_D4-j0lmwZEj_-Yb2-S2MrX",
+    "mint_authority": "ta4xUEvMgPYGUiCrbX0az58_D4-j0lmwZEj_-Yb2-S2MrX",
+    "freeze_authority": "ta4xUEvMgPYGUiCrbX0az58_D4-j0lmwZEj_-Yb2-S2MrX"
+  }
+}
+```
+
+<br>
+
+### 2️⃣ Create Token Account
+
+```bash
+SEED=$(python3 -c "import secrets; print(secrets.token_hex(32))")
+
+thru token initialize-account \
+  <MINT_ADDRESS> \
+  <OWNER_ADDRESS> \
+  $SEED \
+  --json
+```
+
+**Response:**
+```json
+{
+  "token_initialize_account": {
+    "status": "success",
+    "token_account": "taQPEDM_d7C-cGQj8Yv6IRVUqmP22tfzUyGTsd_cnCCsMm",
+    "mint": "ta5YmaFApl_3d8d92gVRPVNCZldHxUtgXMTKPYCeTbc-4o",
+    "owner": "ta4xUEvMgPYGUiCrbX0az58_D4-j0lmwZEj_-Yb2-S2MrX"
+  }
+}
+```
+
+<br>
+
+### 3️⃣ Mint Tokens
+
+```bash
+# Mint 1B tokens (1,000,000,000 * 10^9 = 1000000000000000000)
+thru token mint-to \
+  <MINT_ADDRESS> \
+  <TOKEN_ACCOUNT_ADDRESS> \
+  <AUTHORITY_ADDRESS> \
+  1000000000000000000 \
+  --json
+```
+
+<br>
+
+### 4️⃣ Transfer Tokens
+
+```bash
+# First, create token account for recipient
+SEED=$(python3 -c "import secrets; print(secrets.token_hex(32))")
+thru token initialize-account <MINT> <RECIPIENT> $SEED --json
+
+# Then transfer
+thru token transfer \
+  <SOURCE_TOKEN_ACCOUNT> \
+  <DEST_TOKEN_ACCOUNT> \
+  50000000000 \
+  --json
+```
+
+<br>
+
+### 5️⃣ Burn Tokens
+
+```bash
+thru token burn \
+  <TOKEN_ACCOUNT> \
+  <MINT_ADDRESS> \
+  <AUTHORITY_ADDRESS> \
+  100000000000 \
+  --json
+```
+
+<br>
+
+### 6️⃣ Freeze Account
+
+```bash
+thru token freeze-account \
+  <TOKEN_ACCOUNT> \
+  <MINT_ADDRESS> \
+  <FREEZE_AUTHORITY_ADDRESS> \
+  --json
+```
+
+**Verify frozen:**
+```bash
+thru token balance <TOKEN_ACCOUNT> --json
+# "is_frozen": true
+```
+
+<br>
+
+### 7️⃣ Thaw Account
+
+```bash
+thru token thaw-account \
+  <TOKEN_ACCOUNT> \
+  <MINT_ADDRESS> \
+  <FREEZE_AUTHORITY_ADDRESS> \
+  --json
+```
+
+<br>
+
+### 📊 FRIO Token Summary
+
+| Property | Value |
+|----------|-------|
+| **Mint** | `ta5YmaFApl_3d8d92gVRPVNCZldHxUtgXMTKPYCeTbc-4o` |
+| **Ticker** | FRIO |
+| **Decimals** | 9 |
+| **Initial Supply** | 1,000,000,000 FRIO |
+| **Mint Authority** | `ta4xUEvMgPYGUiCrbX0az58_D4-j0lmwZEj_-Yb2-S2MrX` |
+| **Freeze Authority** | `ta4xUEvMgPYGUiCrbX0az58_D4-j0lmwZEj_-Yb2-S2MrX` |
+| **Status** | Live on alphanet |
+
+**Operations Performed:**
+- ✅ Transfer 50 FRIO to faucet address
+- ✅ Burn 150 FRIO
+- ✅ Freeze faucet's token account
+- ❌ Revoke authority — not supported on-chain
 
 <br>
 
@@ -1170,10 +1343,32 @@ thru txn make-state-proof creating <addr>  # Generate proof
 <summary><b>🪙 Tokens</b></summary>
 
 ```bash
+# Initialize mint
+thru token initialize-mint <creator> <ticker> <seed> --decimals 9
+
+# Initialize token account
+thru token initialize-account <mint> <owner> <seed>
+
+# Mint tokens
+thru token mint-to <mint> <to> <authority> <amount>
+
+# Transfer tokens
 thru token transfer <from> <to> <amount>
-thru token balance <address>
-thru token mint <mint> <to> <amount>
-thru token burn <account> <amount>
+
+# Burn tokens
+thru token burn <account> <mint> <authority> <amount>
+
+# Freeze account
+thru token freeze-account <account> <mint> <authority>
+
+# Thaw account
+thru token thaw-account <account> <mint> <authority>
+
+# Check balance
+thru token balance <account>
+
+# Close account
+thru token close-account <account> <destination> <authority>
 ```
 
 </details>
@@ -1238,14 +1433,14 @@ thru faucet request <name>  # Get testnet tokens
 <tr>
 <td width="50%">
 
-### 🔄 Counter Program
+### 🔄 Counter Program v2
 
 | Property | Value |
 |----------|-------|
 | **Address** | `taLBRGzlvDoOBRPZlwQeMMizFrjWdYNw3Dnauw37N62dbm` |
 | **Meta** | `ta2hkBlLSQMnOmx03aLuT4Qu-u0MnO95bnHrmHU50fMKkP` |
 | **Deployer** | `ta4xUEvMgPYGUiCrbX0az58_D4-j0lmwZEj_-Yb2-S2MrX` |
-| **Size** | 864 bytes |
+| **Size** | 1162 bytes |
 
 </td>
 <td width="50%">
@@ -1256,6 +1451,8 @@ thru faucet request <name>  # Get testnet tokens
 |-------------|------|-------------|
 | Create | `0` | Init counter to 0 |
 | Increment | `1` | Counter += 1 |
+| Decrement | `2` | Counter -= 1 (underflow protected) |
+| Reset | `3` | Counter = 0 |
 
 **Quick Test:**
 ```bash
@@ -1264,6 +1461,18 @@ thru txn execute --fee 0 \
   --readwrite-accounts <counter> \
   taLBRGzlvDoOBRPZlwQeMMizFrjWdYNw3Dnauw37N62dbm \
   010000000200
+
+# Decrement
+thru txn execute --fee 0 \
+  --readwrite-accounts <counter> \
+  taLBRGzlvDoOBRPZlwQeMMizFrjWdYNw3Dnauw37N62dbm \
+  020000000200
+
+# Reset
+thru txn execute --fee 0 \
+  --readwrite-accounts <counter> \
+  taLBRGzlvDoOBRPZlwQeMMizFrjWdYNw3Dnauw37N62dbm \
+  030000000200
 ```
 
 </td>
@@ -1271,6 +1480,18 @@ thru txn execute --fee 0 \
 </table>
 
 > 📁 Source code: [`examples/counter/`](examples/counter/)
+
+<br>
+
+### 🪙 FRIO Token
+
+| Property | Value |
+|----------|-------|
+| **Mint** | `ta5YmaFApl_3d8d92gVRPVNCZldHxUtgXMTKPYCeTbc-4o` |
+| **Ticker** | FRIO |
+| **Decimals** | 9 |
+| **Supply** | 1,000,000,000 FRIO |
+| **Creator** | `ta4xUEvMgPYGUiCrbX0az58_D4-j0lmwZEj_-Yb2-S2MrX` |
 
 <br>
 
