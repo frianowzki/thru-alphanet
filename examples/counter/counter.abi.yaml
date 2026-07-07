@@ -1,0 +1,79 @@
+abi:
+  package: thru.example.counter
+  name: "Counter Program"
+  abi-version: 1
+  package-version: 1.0.0
+  description: "Simple counter program - create, increment, and track values on-chain"
+  imports: []
+  options:
+    program-metadata:
+      root-types:
+        instruction-root: "CounterInstruction"
+        account-root: "CounterAccount"
+
+types:
+  - name: CreateArgs
+    kind:
+      struct:
+        packed: true
+        fields:
+          - name: account_index
+            field-type:
+              primitive: u16
+          - name: seed
+            field-type:
+              array:
+                size:
+                  literal:
+                    u64: 32
+                element-type:
+                  primitive: u8
+          - name: proof_size
+            field-type:
+              primitive: u32
+
+  - name: IncrementArgs
+    kind:
+      struct:
+        packed: true
+        fields:
+          - name: account_index
+            field-type:
+              primitive: u16
+
+  - name: CounterInstruction
+    kind:
+      struct:
+        packed: true
+        fields:
+          - name: tag
+            field-type:
+              primitive: u8
+          - name: payload
+            field-type:
+              enum:
+                packed: true
+                tag-ref:
+                  field-ref:
+                    path:
+                      - tag
+                variants:
+                  - name: create
+                    tag-value: 0
+                    variant-type:
+                      type-ref:
+                        name: CreateArgs
+                  - name: increment
+                    tag-value: 1
+                    variant-type:
+                      type-ref:
+                        name: IncrementArgs
+
+  - name: CounterAccount
+    kind:
+      struct:
+        packed: true
+        fields:
+          - name: counter_value
+            field-type:
+              primitive: u64
