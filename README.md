@@ -79,6 +79,7 @@
 
 - [Building with AI Agents](#-building-with-ai-agents)
 - [Useful Commands](#-useful-commands-cheat-sheet)
+- [Deployed Programs](#-deployed-programs)
 
 </details>
 
@@ -1226,6 +1227,50 @@ thru faucet request <name>  # Get testnet tokens
 </td>
 </tr>
 </table>
+
+<br>
+
+---
+
+## 🚀 Deployed Programs
+
+<table>
+<tr>
+<td width="50%">
+
+### 🔄 Counter Program
+
+| Property | Value |
+|----------|-------|
+| **Address** | `taLBRGzlvDoOBRPZlwQeMMizFrjWdYNw3Dnauw37N62dbm` |
+| **Meta** | `ta2hkBlLSQMnOmx03aLuT4Qu-u0MnO95bnHrmHU50fMKkP` |
+| **Deployer** | `ta4xUEvMgPYGUiCrbX0az58_D4-j0lmwZEj_-Yb2-S2MrX` |
+| **Size** | 864 bytes |
+
+</td>
+<td width="50%">
+
+### 📋 Operations
+
+| Instruction | Type | Description |
+|-------------|------|-------------|
+| Create | `0` | Init counter to 0 |
+| Increment | `1` | Counter += 1 |
+
+**Quick Test:**
+```bash
+# Increment
+thru txn execute --fee 0 \
+  --readwrite-accounts <counter> \
+  taLBRGzlvDoOBRPZlwQeMMizFrjWdYNw3Dnauw37N62dbm \
+  010000000200
+```
+
+</td>
+</tr>
+</table>
+
+> 📁 Source code: [`examples/counter/`](examples/counter/)
 
 <br>
 
