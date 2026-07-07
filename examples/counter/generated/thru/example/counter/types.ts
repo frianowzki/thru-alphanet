@@ -1115,32 +1115,32 @@ __tnRegisterFootprint("CreateArgs", (params) => CreateArgs.__tnInvokeFootprint(p
 __tnRegisterValidate("CreateArgs", (buffer, params) => CreateArgs.__tnInvokeValidate(buffer, params));
 __tnRegisterDynamicValidate("CreateArgs", (buffer) => { const result = CreateArgs.validate(buffer); const params = (result as { params?: Record<string, bigint> }).params; return { ok: result.ok, code: result.code, consumed: result.consumed === undefined ? undefined : __tnToBigInt(result.consumed), params }; });
 
-/* ----- TYPE DEFINITION FOR IncrementArgs ----- */
+/* ----- TYPE DEFINITION FOR SimpleArgs ----- */
 
-const __tn_ir_IncrementArgs = {
-  typeName: "IncrementArgs",
+const __tn_ir_SimpleArgs = {
+  typeName: "SimpleArgs",
   root: { op: "const", value: 2n }
 } as const;
 
-export class IncrementArgs {
+export class SimpleArgs {
   private view: DataView;
 
   private constructor(private buffer: Uint8Array) {
     this.view = new DataView(buffer.buffer, buffer.byteOffset, buffer.byteLength);
   }
 
-  static __tnCreateView(buffer: Uint8Array, opts?: { fieldContext?: Record<string, number | bigint> }): IncrementArgs {
-    if (!buffer || buffer.length === undefined) throw new Error("IncrementArgs.__tnCreateView requires a Uint8Array");
-    return new IncrementArgs(new Uint8Array(buffer));
+  static __tnCreateView(buffer: Uint8Array, opts?: { fieldContext?: Record<string, number | bigint> }): SimpleArgs {
+    if (!buffer || buffer.length === undefined) throw new Error("SimpleArgs.__tnCreateView requires a Uint8Array");
+    return new SimpleArgs(new Uint8Array(buffer));
   }
 
-  static builder(): IncrementArgsBuilder {
-    return new IncrementArgsBuilder();
+  static builder(): SimpleArgsBuilder {
+    return new SimpleArgsBuilder();
   }
 
-  static fromBuilder(builder: IncrementArgsBuilder): IncrementArgs | null {
+  static fromBuilder(builder: SimpleArgsBuilder): SimpleArgs | null {
     const buffer = builder.build();
-    return IncrementArgs.from_array(buffer);
+    return SimpleArgs.from_array(buffer);
   }
 
   get_account_index(): number {
@@ -1162,11 +1162,11 @@ export class IncrementArgs {
   }
 
   private static __tnFootprintInternal(__tnParams: Record<string, bigint>): bigint {
-    return __tnEvalFootprint(__tn_ir_IncrementArgs.root, { params: __tnParams });
+    return __tnEvalFootprint(__tn_ir_SimpleArgs.root, { params: __tnParams });
   }
 
   private static __tnValidateInternal(buffer: Uint8Array, __tnParams: Record<string, bigint>): { ok: boolean; code?: string; consumed?: bigint } {
-    return __tnValidateIrTree(__tn_ir_IncrementArgs, buffer, __tnParams);
+    return __tnValidateIrTree(__tn_ir_SimpleArgs, buffer, __tnParams);
   }
 
   static __tnInvokeFootprint(__tnParams: Record<string, bigint>): bigint {
@@ -1185,9 +1185,9 @@ export class IncrementArgs {
     const irResult = this.footprintIr();
       const maxSafe = __tnToBigInt(Number.MAX_SAFE_INTEGER);
     if (__tnBigIntGreaterThan(irResult, maxSafe)) {
-      throw new Error('footprint exceeds Number.MAX_SAFE_INTEGER for IncrementArgs');
+      throw new Error('footprint exceeds Number.MAX_SAFE_INTEGER for SimpleArgs');
     }
-    return __tnBigIntToNumber(irResult, 'IncrementArgs::footprint');
+    return __tnBigIntToNumber(irResult, 'SimpleArgs::footprint');
   }
 
   static validate(buffer: Uint8Array, _opts?: { params?: never }): { ok: boolean; code?: string; consumed?: number } {
@@ -1195,17 +1195,17 @@ export class IncrementArgs {
     return { ok: true, consumed: 2 };
   }
 
-  static new(account_index: number): IncrementArgs {
+  static new(account_index: number): SimpleArgs {
     const buffer = new Uint8Array(2);
     const view = new DataView(buffer.buffer);
 
     let offset = 0;
     view.setUint16(0, account_index, true); /* account_index (little-endian) */
 
-    return new IncrementArgs(buffer);
+    return new SimpleArgs(buffer);
   }
 
-  static from_array(buffer: Uint8Array): IncrementArgs | null {
+  static from_array(buffer: Uint8Array): SimpleArgs | null {
     if (!buffer || buffer.length === undefined) {
       return null;
     }
@@ -1214,12 +1214,12 @@ export class IncrementArgs {
     if (!validation.ok) {
       return null;
     }
-    return new IncrementArgs(buffer);
+    return new SimpleArgs(buffer);
   }
 
 }
 
-export class IncrementArgsBuilder {
+export class SimpleArgsBuilder {
   private buffer: Uint8Array;
   private view: DataView;
 
@@ -1243,22 +1243,22 @@ export class IncrementArgsBuilder {
     return target;
   }
 
-  finish(): IncrementArgs {
-    const view = IncrementArgs.from_array(this.buffer.slice());
-    if (!view) throw new Error("failed to build IncrementArgs");
+  finish(): SimpleArgs {
+    const view = SimpleArgs.from_array(this.buffer.slice());
+    if (!view) throw new Error("failed to build SimpleArgs");
     return view;
   }
 }
 
-__tnRegisterFootprint("IncrementArgs", (params) => IncrementArgs.__tnInvokeFootprint(params));
-__tnRegisterValidate("IncrementArgs", (buffer, params) => IncrementArgs.__tnInvokeValidate(buffer, params));
-__tnRegisterDynamicValidate("IncrementArgs", (buffer) => { const result = IncrementArgs.validate(buffer); const params = (result as { params?: Record<string, bigint> }).params; return { ok: result.ok, code: result.code, consumed: result.consumed === undefined ? undefined : __tnToBigInt(result.consumed), params }; });
+__tnRegisterFootprint("SimpleArgs", (params) => SimpleArgs.__tnInvokeFootprint(params));
+__tnRegisterValidate("SimpleArgs", (buffer, params) => SimpleArgs.__tnInvokeValidate(buffer, params));
+__tnRegisterDynamicValidate("SimpleArgs", (buffer) => { const result = SimpleArgs.validate(buffer); const params = (result as { params?: Record<string, bigint> }).params; return { ok: result.ok, code: result.code, consumed: result.consumed === undefined ? undefined : __tnToBigInt(result.consumed), params }; });
 
 /* ----- TYPE DEFINITION FOR CounterInstruction ----- */
 
 const __tn_ir_CounterInstruction = {
   typeName: "CounterInstruction",
-  root: { op: "align", alignment: 1, node: { op: "add", left: { op: "align", alignment: 1, node: { op: "const", value: 1n } }, right: { op: "align", alignment: 1, node: { op: "switch", tag: "CounterInstruction::payload.tag", cases: [{ value: 0, node: { op: "align", alignment: 1, node: { op: "const", value: 38n } } }, { value: 1, node: { op: "align", alignment: 1, node: { op: "const", value: 2n } } }] } } } }
+  root: { op: "align", alignment: 1, node: { op: "add", left: { op: "align", alignment: 1, node: { op: "const", value: 1n } }, right: { op: "align", alignment: 1, node: { op: "switch", tag: "CounterInstruction::payload.tag", cases: [{ value: 0, node: { op: "align", alignment: 1, node: { op: "const", value: 38n } } }, { value: 1, node: { op: "align", alignment: 1, node: { op: "const", value: 2n } } }, { value: 2, node: { op: "align", alignment: 1, node: { op: "const", value: 2n } } }, { value: 3, node: { op: "align", alignment: 1, node: { op: "const", value: 2n } } }] } } } }
 } as const;
 
 export class CounterInstruction_payload_Inner {
@@ -1286,9 +1286,19 @@ export class CounterInstruction_payload_Inner {
     return CreateArgs.__tnCreateView(new Uint8Array(this.buffer), { fieldContext: this.__tnFieldContext ?? undefined });
   }
 
-  asIncrement(): IncrementArgs | null {
+  asIncrement(): SimpleArgs | null {
     if (!this.descriptor || this.descriptor.tag !== 1) return null;
-    return IncrementArgs.__tnCreateView(new Uint8Array(this.buffer), { fieldContext: this.__tnFieldContext ?? undefined });
+    return SimpleArgs.__tnCreateView(new Uint8Array(this.buffer), { fieldContext: this.__tnFieldContext ?? undefined });
+  }
+
+  asDecrement(): SimpleArgs | null {
+    if (!this.descriptor || this.descriptor.tag !== 2) return null;
+    return SimpleArgs.__tnCreateView(new Uint8Array(this.buffer), { fieldContext: this.__tnFieldContext ?? undefined });
+  }
+
+  asReset(): SimpleArgs | null {
+    if (!this.descriptor || this.descriptor.tag !== 3) return null;
+    return SimpleArgs.__tnCreateView(new Uint8Array(this.buffer), { fieldContext: this.__tnFieldContext ?? undefined });
   }
 
 }
@@ -1351,7 +1361,21 @@ export class CounterInstruction {
       tag: 1,
       payloadSize: 2,
       payloadType: "CounterInstruction::payload::increment",
-      createPayloadBuilder: () => __tnMaybeCallBuilder(IncrementArgs),
+      createPayloadBuilder: () => __tnMaybeCallBuilder(SimpleArgs),
+    },
+    {
+      name: "decrement",
+      tag: 2,
+      payloadSize: 2,
+      payloadType: "CounterInstruction::payload::decrement",
+      createPayloadBuilder: () => __tnMaybeCallBuilder(SimpleArgs),
+    },
+    {
+      name: "reset",
+      tag: 3,
+      payloadSize: 2,
+      payloadType: "CounterInstruction::payload::reset",
+      createPayloadBuilder: () => __tnMaybeCallBuilder(SimpleArgs),
     },
   ] as const);
 

@@ -10,10 +10,13 @@
 #define TN_COUNTER_ERR_ACCOUNT_SET_WRITABLE_FAILED   (0x1003UL)
 #define TN_COUNTER_ERR_ACCOUNT_RESIZE_FAILED         (0x1004UL)
 #define TN_COUNTER_ERR_ACCOUNT_DATA_ACCESS_FAILED    (0x1005UL)
+#define TN_COUNTER_ERR_COUNTER_UNDERFLOW             (0x1006UL)
 
 /* Instruction types */
 #define TN_COUNTER_INSTRUCTION_CREATE    (0U)
 #define TN_COUNTER_INSTRUCTION_INCREMENT (1U)
+#define TN_COUNTER_INSTRUCTION_DECREMENT (2U)
+#define TN_COUNTER_INSTRUCTION_RESET     (3U)
 
 /* Create counter instruction arguments */
 typedef struct __attribute__((packed)) {
@@ -24,11 +27,11 @@ typedef struct __attribute__((packed)) {
     /* proof_data follows dynamically based on proof_size */
 } tn_counter_create_args_t;
 
-/* Increment counter instruction arguments */
+/* Simple instruction arguments (increment/decrement/reset) */
 typedef struct __attribute__((packed)) {
     uint instruction_type;
     ushort account_index;
-} tn_counter_increment_args_t;
+} tn_counter_simple_args_t;
 
 /* Counter account data structure */
 typedef struct __attribute__((packed)) {

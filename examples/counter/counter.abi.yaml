@@ -2,8 +2,8 @@ abi:
   package: thru.example.counter
   name: "Counter Program"
   abi-version: 1
-  package-version: 1.0.0
-  description: "Simple counter program - create, increment, and track values on-chain"
+  package-version: 2.0.0
+  description: "Counter program v2 - create, increment, decrement, reset"
   imports: []
   options:
     program-metadata:
@@ -32,7 +32,7 @@ types:
             field-type:
               primitive: u32
 
-  - name: IncrementArgs
+  - name: SimpleArgs
     kind:
       struct:
         packed: true
@@ -67,7 +67,17 @@ types:
                     tag-value: 1
                     variant-type:
                       type-ref:
-                        name: IncrementArgs
+                        name: SimpleArgs
+                  - name: decrement
+                    tag-value: 2
+                    variant-type:
+                      type-ref:
+                        name: SimpleArgs
+                  - name: reset
+                    tag-value: 3
+                    variant-type:
+                      type-ref:
+                        name: SimpleArgs
 
   - name: CounterAccount
     kind:
