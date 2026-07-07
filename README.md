@@ -7,7 +7,7 @@
 
 <h1 align="center">
   <br>
-  ⚡ Thru Alphanet
+  🕊️ Thru Alphanet
   <br>
 </h1>
 
