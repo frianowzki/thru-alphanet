@@ -1590,6 +1590,34 @@ thru txn execute --fee 0 --readwrite-accounts <PDA> ta2sYKmgW-b0FQEP2-pMYROxnAIM
 
 <br>
 
+### 🔒 Escrow Program v1
+
+| Property | Value |
+|----------|-------|
+| **Program** | `taYRu8D8yaZksfNK42mTXIpbqVcmgS6Zr0agCeqOpBSOaL` |
+| **Meta** | `tajTHKh2W2uvY1Se79Ju2hCCrv0QIW1lG8n1F8cVqW7Zg2` |
+| **Seed** | `escrow-v1` |
+| **Size** | 1202 bytes |
+| **Source** | [`examples/counter/tn_escrow.c`](examples/counter/tn_escrow.c) |
+
+| Instruction | Type | Description |
+|-------------|------|-------------|
+| Create | `0` | Lock funds (buyer + seller) |
+| Release | `1` | Send to seller |
+| Dispute | `2` | Flag for review |
+| Refund | `3` | Return to buyer |
+| Read | `4` | Get escrow state |
+
+**State Machine:**
+```
+Created → Released
+Created → Disputed → Released
+Created → Disputed → Refunded
+Created → Refunded
+```
+
+<br>
+
 ### 🗳️ Voting Program v4
 
 | Property | Value |
