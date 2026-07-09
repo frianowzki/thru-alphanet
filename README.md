@@ -16,6 +16,47 @@ thru account create default
 thru faucet withdraw default 10000
 ```
 
+## Deploy a Counter Program
+
+Step-by-step from zero to a live on-chain counter:
+
+```bash
+# 1. Install Thru CLI
+npm i -g thru
+
+# 2. Generate a keypair
+thru keys generate default
+
+# 3. Create an account on Alphanet
+thru account create default
+
+# 4. Fund it with testnet tokens
+thru faucet withdraw default 10000
+
+# 5. Clone this repo
+git clone https://github.com/frianowzki/thru-alphanet.git
+cd thru-alphanet/examples/counter
+
+# 6. Build the counter program (requires Thru C SDK)
+make
+
+# 7. Deploy to Alphanet
+thru program create my-counter build/thruvm/bin/tn_counter_program_c.bin
+```
+
+After deployment, you'll get a **program address**. Use it to create a counter instance:
+
+```bash
+# 8. Derive your PDA address
+thru program derive-address my-counter --json
+
+# 9. Interact with your counter
+thru contract call --program <PROGRAM_ADDR> --data '{"Increment":{}}' --accounts <PDA>
+thru contract call --program <PROGRAM_ADDR> --data '{"Read":{}}' --accounts <PDA>
+```
+
+That's it — your counter is live on Thru Alphanet.
+
 ## Projects
 
 | Project | Path | What it does |
