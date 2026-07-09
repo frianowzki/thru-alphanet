@@ -22,7 +22,7 @@ sleep 1
 
 # ── Start API Server ──
 echo "▸ Starting API server..."
-cd /home/frio
+cd "$HOME"
 THRU_KEY_NAME=$THRU_KEY PORT=$API_PORT python3 "$SCRIPT_DIR/server.py" &
 API_PID=$!
 sleep 2
