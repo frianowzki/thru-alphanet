@@ -19,6 +19,8 @@
         .btn-i{background:#00d4ff;color:#000}.btn-d{background:#ff6b6b;color:#fff}
         .btn-r{background:#6c5ce7;color:#fff}.btn-ro{background:#00b894;color:#fff;grid-column:span 3}
         .btn-connect{background:linear-gradient(135deg,#00d4ff,#6c5ce7);color:#fff;width:100%;padding:14px}
+        .btn-faucet{background:linear-gradient(135deg,#00b894,#00cec9);color:#fff;width:100%;padding:10px;margin-top:10px;border:none;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .15s}
+        .btn-faucet:hover{transform:translateY(-1px);opacity:.9}.btn-faucet:active{transform:none}
         .ig{margin-bottom:14px}.ig label{display:block;margin-bottom:6px;color:#888;font-size:.85rem}
         .ig input{width:100%;padding:11px;background:#0d0d1a;border:1px solid #2a2a3e;border-radius:8px;color:#fff;font-size:.95rem;font-family:monospace}
         .ig input:focus{outline:none;border-color:#00d4ff}
@@ -79,6 +81,7 @@
             </div>
             <div class="wb" id="wallet-bal">—</div>
         </div>
+        <button class="btn btn-faucet" id="btn-faucet" onclick="requestFaucet()">🚰 Request 10 Tokens</button>
     </div>
 
     <!-- Counter Card -->
@@ -202,6 +205,34 @@ async function connectWallet() {
         await readVal();
     } catch (e) {
         log(`Error: ${e.message}`, 'er');
+    }
+}
+
+async function requestFaucet() {
+    const pk = document.getElementById('privkey').value.trim();
+    if (!pk) { log('Enter your private key first', 'er'); return; }
+    if (!API_BASE) { log('API not connected', 'er'); return; }
+
+    const btn = document.getElementById('btn-faucet');
+    const orig = btn.textContent;
+    btn.innerHTML = '<span class="ld"></span>';
+    btn.disabled = true;
+
+    log('Requesting faucet tokens...');
+    try {
+        const data = await api('/api/faucet/request', {
+            method: 'POST',
+            body: { privateKey: pk, amount: 10 },
+        });
+        if (data.error) throw new Error(data.error);
+
+        document.getElementById('wallet-bal').textContent = data.balance.toLocaleString();
+        log(`Faucet: +${data.amount} tokens (balance: ${data.balance})`, 'ok');
+    } catch (e) {
+        log(`Faucet error: ${e.message}`, 'er');
+    } finally {
+        btn.textContent = orig;
+        btn.disabled = false;
     }
 }
 

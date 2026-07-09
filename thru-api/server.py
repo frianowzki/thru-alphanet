@@ -256,7 +256,7 @@ class ThruHandler(BaseHTTPRequestHandler):
                 if err:
                     return self.send_json({"error": f"Key import failed: {err}"}, 400)
 
-                amount = int(body.get("amount", 10000))
+                amount = int(body.get("amount", 10))
 
                 # Step 1: Create on-chain account if needed
                 acct_data = thru_cmd(["account", "info", key_name])
