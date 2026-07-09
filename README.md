@@ -1590,6 +1590,25 @@ thru txn execute --fee 0 --readwrite-accounts <PDA> ta2sYKmgW-b0FQEP2-pMYROxnAIM
 
 <br>
 
+### 🗳️ Voting Program v4
+
+| Property | Value |
+|----------|-------|
+| **Program** | `taH5gAKRdirmY8kImoKAeW4lzk6fZCJbbNm6eLDtYcJxoo` |
+| **Meta** | `taOseKa5mI857F9Tmf52EzqB-3oswq_7G7ASbNrPPv_xjP` |
+| **Seed** | `voting-v4` |
+| **Size** | 1402 bytes |
+| **Source** | [`examples/counter/tn_voting.c`](examples/counter/tn_voting.c) |
+
+| Instruction | Type | Description |
+|-------------|------|-------------|
+| Create Proposal | `0` | Init with N options |
+| Cast Vote | `1` | Vote for option (duplicate protected) |
+| Close Proposal | `2` | Stop accepting votes |
+| Read Results | `3` | Emit vote counts as events |
+
+<br>
+
 ### 🪙 FRIO Token
 
 | Property | Value |
