@@ -178,14 +178,39 @@ claude mcp add --transport stdio thru-mcp python3 ~/thru-mcp/server.py
 
 Tools: `get_balance`, `get_block_height`, `get_health`, `get_transaction`, `derive_address`, `make_state_proof`
 
-## Frontend
+## Frontend (Real On-Chain)
+
+Web UI with real on-chain execution via backend API.
 
 ```bash
-cd thru-frontend && python3 -m http.server 8080
-# open http://localhost:8080
+# Start API server (proxies to thru CLI)
+cd ~/thru-alphanet && THRU_KEY_NAME=frio PORT=3001 python3 thru-api/server.py
+
+# Open http://localhost:3001
 ```
 
-Counter UI with increment/decrement/reset, activity log, dark mode.
+**How it works:**
+```
+Browser → API Server (localhost:3001) → thru CLI → Thru Blockchain
+```
+
+**API Endpoints:**
+
+| Endpoint | Method | Description |
+|----------|--------|-------------|
+| `/api/status` | GET | Network health |
+| `/api/wallet/balance` | GET | Active wallet balance |
+| `/api/counter/value?pda=<addr>` | GET | Read counter value |
+| `/api/counter/execute` | POST | Execute inc/dec/reset |
+| `/api/counter/create` | POST | Create new counter PDA |
+
+**Environment Variables:**
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `PORT` | `3001` | Server port |
+| `THRU_KEY_NAME` | `default` | Key name from `~/.thru/cli/config.yaml` |
+| `THRU_COUNTER_PROGRAM` | (counter v7 address) | Program address |
 
 ## Faucet & Airdrop
 
