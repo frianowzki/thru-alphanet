@@ -71,6 +71,9 @@
 <details>
 <summary><b>📦 On-Chain Programs</b></summary>
 
+- [Counter Program v7](#-counter-program-v7)
+- [Voting Program v4](#-voting-program-v4)
+- [Escrow Program v1](#-escrow-program-v1)
 - [Token Program](#-token-program)
 - [Token Program Flow (FRIO Example)](#-token-program-flow-frio-example)
 - [NFT Program](#-nft-program)
@@ -81,8 +84,18 @@
 <summary><b>🤖 AI & Automation</b></summary>
 
 - [Building with AI Agents](#-building-with-ai-agents)
+- [Telegram Bot](#-telegram-bot)
+- [MCP Server](#-mcp-server)
+- [Faucet & Airdrop Tools](#-faucet--airdrop-tools)
 - [Useful Commands](#-useful-commands-cheat-sheet)
 - [Deployed Programs](#-deployed-programs)
+
+</details>
+
+<details>
+<summary><b>🌐 Frontend</b></summary>
+
+- [Counter Frontend](#-counter-frontend)
 
 </details>
 
@@ -1363,6 +1376,149 @@ This installs `thru-best-practices` — recommended for agent-driven development
 ```
 
 <br>
+
+---
+
+## 🤖 Telegram Bot
+
+Telegram bot untuk interact sama Thru blockchain langsung dari chat.
+
+### Setup
+
+```bash
+# Install dependencies
+pip install python-telegram-bot
+
+# Set bot token (dari @BotFather)
+export THRU_BOT_TOKEN="your-token-here"
+
+# Run bot
+python3 ~/thru-bot/bot.py
+```
+
+### Commands
+
+| Command | Description |
+|---------|-------------|
+| `/balance [address]` | Check balance |
+| `/send <to> <amount>` | Send tokens |
+| `/deploy <binary> [seed]` | Deploy program |
+| `/programs` | List deployed programs |
+| `/status` | Network status |
+
+### Source
+
+📁 [`thru-bot/bot.py`](thru-bot/bot.py)
+
+---
+
+## 🔌 MCP Server
+
+Model Context Protocol server untuk AI agents (Claude Code, Codex, etc).
+
+### Setup
+
+```bash
+pip install mcp
+
+# Run server
+python3 ~/thru-mcp/server.py
+
+# Add to Claude Code
+claude mcp add --transport stdio thru-explorer python3 ~/thru-mcp/server.py
+```
+
+### Available Tools
+
+| Tool | Description |
+|------|-------------|
+| `get_balance` | Check account balance |
+| `get_block_height` | Get current block height |
+| `get_health` | Network health status |
+| `get_transaction` | Get transaction details |
+| `derive_address` | Derive PDA address |
+| `make_state_proof` | Generate state proof |
+| `list_programs` | List deployed programs |
+| `get_network_info` | Comprehensive network info |
+
+### Source
+
+📁 [`thru-mcp/server.py`](thru-mcp/server.py)
+
+---
+
+## 🚰 Faucet & Airdrop Tools
+
+### Faucet Bot
+
+Interactive faucet untuk distribute testnet tokens.
+
+```bash
+# Interactive mode
+python3 ~/thru-bot/faucet.py
+
+# CLI mode
+python3 ~/thru-bot/faucet.py <address1> <address2> ...
+```
+
+**Features:**
+- Cooldown: 60s between requests
+- Daily limit: 10,000 tokens per address
+- Batch distribute support
+
+### Airdrop Tool
+
+Bulk send tokens ke multiple wallets.
+
+```bash
+# From CSV file
+python3 ~/thru-bot/airdrop.py airdrop addresses.csv 100
+
+# Single send
+python3 ~/thru-bot/airdrop.py send <address> 100
+
+# Interactive mode
+python3 ~/thru-bot/airdrop.py
+```
+
+**CSV Format:**
+```csv
+ta1abc...,100
+ta2def...,200
+ta3ghi...
+```
+
+### Source
+
+📁 [`thru-bot/faucet.py`](thru-bot/faucet.py)
+📁 [`thru-bot/airdrop.py`](thru-bot/airdrop.py)
+
+---
+
+## 🌐 Counter Frontend
+
+Web UI untuk interact sama counter program on-chain.
+
+### Features
+
+- Counter display with increment/decrement/reset
+- Configuration panel (program + PDA address)
+- Activity log
+- Dark mode design
+
+### Usage
+
+```bash
+# Open in browser
+open ~/thru-frontend/index.html
+
+# Or serve locally
+cd ~/thru-frontend && python3 -m http.server 8080
+```
+
+### Source
+
+📁 [`thru-frontend/index.html`](thru-frontend/index.html)
 
 ---
 

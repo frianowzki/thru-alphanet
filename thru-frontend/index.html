@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thru Counter</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0a0a0f; color: #fff; min-height: 100vh; }
+        .container { max-width: 600px; margin: 0 auto; padding: 40px 20px; }
+        h1 { font-size: 2rem; text-align: center; margin-bottom: 10px; }
+        .subtitle { text-align: center; color: #888; margin-bottom: 40px; }
+        .card { background: #1a1a2e; border-radius: 16px; padding: 24px; margin-bottom: 20px; border: 1px solid #2a2a3e; }
+        .card h2 { font-size: 1.2rem; margin-bottom: 16px; color: #00d4ff; }
+        .counter-display { font-size: 4rem; text-align: center; padding: 20px; background: #0d0d1a; border-radius: 12px; margin-bottom: 20px; font-weight: bold; }
+        .buttons { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+        .btn { padding: 16px; border: none; border-radius: 12px; font-size: 1rem; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+        .btn:hover { transform: translateY(-2px); }
+        .btn:active { transform: translateY(0); }
+        .btn-inc { background: #00d4ff; color: #000; }
+        .btn-dec { background: #ff6b6b; color: #fff; }
+        .btn-reset { background: #6c5ce7; color: #fff; }
+        .btn-read { background: #00b894; color: #fff; grid-column: span 3; }
+        .input-group { margin-bottom: 16px; }
+        .input-group label { display: block; margin-bottom: 8px; color: #888; font-size: 0.9rem; }
+        .input-group input { width: 100%; padding: 12px; background: #0d0d1a; border: 1px solid #2a2a3e; border-radius: 8px; color: #fff; font-size: 1rem; }
+        .input-group input:focus { outline: none; border-color: #00d4ff; }
+        .status { padding: 12px; background: #0d0d1a; border-radius: 8px; margin-top: 16px; font-family: monospace; font-size: 0.85rem; color: #888; max-height: 150px; overflow-y: auto; }
+        .status .success { color: #00b894; }
+        .status .error { color: #ff6b6b; }
+        .badge { display: inline-block; padding: 4px 8px; background: #2a2a3e; border-radius: 6px; font-size: 0.75rem; margin-left: 8px; }
+        .footer { text-align: center; margin-top: 40px; color: #555; font-size: 0.85rem; }
+        a { color: #00d4ff; text-decoration: none; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🕊️ Thru Counter</h1>
+        <p class="subtitle">On-chain counter on Thru Alphanet</p>
+
+        <div class="card">
+            <h2>Counter Value</h2>
+            <div class="counter-display" id="counter">—</div>
+            <div class="buttons">
+                <button class="btn btn-dec" onclick="execute('decrement')">−1</button>
+                <button class="btn btn-reset" onclick="execute('reset')">Reset</button>
+                <button class="btn btn-inc" onclick="execute('increment')">+1</button>
+                <button class="btn btn-read" onclick="execute('read')">Read Value</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Configuration</h2>
+            <div class="input-group">
+                <label>Program Address</label>
+                <input type="text" id="program" value="ta2sYKmgW-b0FQEP2-pMYROxnAIMTrZTgpJqgVvxAHe423">
+            </div>
+            <div class="input-group">
+                <label>PDA Address (Counter Account)</label>
+                <input type="text" id="pda" value="tazoq1-tfh31JRP8_oobSNku4zS6p3B_3c1Yw82g9ajUDF">
+            </div>
+        </div>
+
+        <div class="card">
+            <h2>Activity Log</h2>
+            <div class="status" id="log">
+                <div>Ready. Click a button to interact with the counter.</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            Built on <a href="https://thru.org">Thru Alphanet</a> • 
+            <a href="https://github.com/frianowzki/thru-alphanet">GitHub</a>
+        </div>
+    </div>
+
+    <script>
+        const RPC = 'https://rpc.alphanet.thru.org';
+        const log = document.getElementById('log');
+        const counterDisplay = document.getElementById('counter');
+
+        function appendLog(msg, type = '') {
+            const div = document.createElement('div');
+            div.className = type;
+            div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+            log.appendChild(div);
+            log.scrollTop = log.scrollHeight;
+        }
+
+        function getInstrData(type) {
+            const INSTRUCTIONS = {
+                increment: '010000000200',
+                decrement: '020000000200',
+                reset:     '030000000200',
+                read:      '040000000200',
+            };
+            return INSTRUCTIONS[type];
+        }
+
+        async function execute(type) {
+            const program = document.getElementById('program').value;
+            const pda = document.getElementById('pda').value;
+            const instrData = getInstrData(type);
+
+            appendLog(`Executing ${type}...`);
+
+            try {
+                // Note: This is a simplified version. In production, you'd need to:
+                // 1. Build the transaction properly
+                // 2. Sign it with a keypair
+                // 3. Submit via RPC
+                
+                appendLog(`Program: ${program.substring(0, 20)}...`, 'success');
+                appendLog(`PDA: ${pda.substring(0, 20)}...`, 'success');
+                appendLog(`Instruction: ${instrData}`, 'success');
+                appendLog('⚠️ Connect wallet to execute transactions', 'error');
+                
+                // For demo, simulate counter changes
+                if (type === 'increment') {
+                    const current = parseInt(counterDisplay.textContent) || 0;
+                    counterDisplay.textContent = current + 1;
+                } else if (type === 'decrement') {
+                    const current = parseInt(counterDisplay.textContent) || 0;
+                    counterDisplay.textContent = Math.max(0, current - 1);
+                } else if (type === 'reset') {
+                    counterDisplay.textContent = '0';
+                }
+            } catch (err) {
+                appendLog(`Error: ${err.message}`, 'error');
+            }
+        }
+
+        // Initial read
+        appendLog('Counter v7 loaded. Ready to interact.');
+    </script>
+</body>
+</html>
