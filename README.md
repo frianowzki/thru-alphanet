@@ -1537,15 +1537,15 @@ thru faucet request <name>  # Get testnet tokens
 <tr>
 <td width="50%">
 
-### 🔄 Counter Program v6
+### 🔄 Counter Program v7
 
 | Property | Value |
 |----------|-------|
-| **Program** | `taE2wANaUFCpWJNexcbSMlaHmDvKLcP69tBrsNwO8uoMC8` |
-| **Meta** | `ta21YDcTEDUbvjmgfKa4yVO6zjadTcwpN_pTJdsMu6ngB9` |
-| **Seed** | `counter-v6` |
-| **Size** | 864 bytes |
-| **Source** | [`examples/tn_counter_program.c`](examples/tn_counter_program.c) |
+| **Program** | `ta2sYKmgW-b0FQEP2-pMYROxnAIMTrZTgpJqgVvxAHe423` |
+| **Meta** | `ta3O9EaMvENH7aYg5HzOgDa0pO_j7mgdwYBXMOifCDKNQY` |
+| **Seed** | `counter-v7` |
+| **Size** | 1148 bytes |
+| **Source** | [`examples/counter/tn_counter_v7.c`](examples/counter/tn_counter_v7.c) |
 
 </td>
 <td width="50%">
@@ -1556,21 +1556,31 @@ thru faucet request <name>  # Get testnet tokens
 |-------------|------|-------------|
 | Create | `0` | Init counter to 0 |
 | Increment | `1` | Counter += 1 (emits event) |
+| Decrement | `2` | Counter -= 1 (underflow protected) |
+| Reset | `3` | Counter = 0 (emits event) |
+| Read | `4` | Emit current value (read-only) |
 
 **Quick Test:**
 ```bash
 # 1. Derive PDA
-thru program derive-address taE2wANaUFCpWJNexcbSMlaHmDvKLcP69tBrsNwO8uoMC8 my-counter
+thru program derive-address ta2sYKmgW-b0FQEP2-pMYROxnAIMTrZTgpJqgVvxAHe423 test-counter
 
 # 2. Make state proof
 thru txn make-state-proof creating <PDA>
 
 # 3. Create counter (use python to build instr data)
-# 4. Increment counter
-thru txn execute --fee 0 \
-  --readwrite-accounts <PDA> \
-  taE2wANaUFCpWJNexcbSMlaHmDvKLcP69tBrsNwO8uoMC8 \
-  010000000200
+
+# 4. Increment
+thru txn execute --fee 0 --readwrite-accounts <PDA> ta2sYKmgW-b0FQEP2-pMYROxnAIMTrZTgpJqgVvxAHe423 010000000200
+
+# 5. Decrement
+thru txn execute --fee 0 --readwrite-accounts <PDA> ta2sYKmgW-b0FQEP2-pMYROxnAIMTrZTgpJqgVvxAHe423 020000000200
+
+# 6. Reset
+thru txn execute --fee 0 --readwrite-accounts <PDA> ta2sYKmgW-b0FQEP2-pMYROxnAIMTrZTgpJqgVvxAHe423 030000000200
+
+# 7. Read
+thru txn execute --fee 0 --readwrite-accounts <PDA> ta2sYKmgW-b0FQEP2-pMYROxnAIMTrZTgpJqgVvxAHe423 040000000200
 ```
 
 </td>
