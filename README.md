@@ -43,6 +43,8 @@
 <summary><b>🛠️ Development</b></summary>
 
 - [Program Development (C SDK)](#-program-development-c-sdk)
+- [Complete Counter Walkthrough](#-complete-counter-walkthrough)
+- [Common Pitfalls](#️-common-pitfalls)
 - [ABI System](#-abi-system)
 - [Core Concepts](#-core-concepts)
 
@@ -425,6 +427,102 @@ TSDK_ENTRYPOINT_FN void start(void) {
 
 <br>
 
+### 🎯 Complete Counter Walkthrough
+
+Full step-by-step guide to build, deploy, and interact with a counter program.
+
+#### Account Indexing
+
+When your program executes, accounts are ordered in the transaction array:
+
+```
+┌─────────────────────────────────────────┐
+│  0: Fee Payer       (pays for execution)│
+│  1: Program         (code to execute)   │
+│  2+: Writable Accts (sorted by hex key) │
+│  N+: Read-only Accts (sorted by hex key)│
+└─────────────────────────────────────────┘
+```
+
+> 💡 **Key insight**: Your program reads instruction data via `tsdk_get_txn()`, NOT via function arguments. The entry point is `start(void)`.
+
+#### Instruction Data Format
+
+**Create Counter** (instruction_type = 0):
+```c
+typedef struct __attribute__((packed)) {
+    uint instruction_type;                    // 4 bytes (0)
+    ushort account_index;                     // 2 bytes (2 = first writable)
+    uchar counter_program_seed[TN_SEED_SIZE]; // 32 bytes
+    uint proof_size;                          // 4 bytes
+    /* proof_data follows dynamically */
+} tn_counter_create_args_t;
+// Total fixed: 42 bytes + proof_size
+```
+
+**Increment Counter** (instruction_type = 1):
+```c
+typedef struct __attribute__((packed)) {
+    uint instruction_type;  // 4 bytes (1)
+    ushort account_index;   // 2 bytes (2)
+} tn_counter_increment_args_t;
+// Total: 6 bytes
+```
+
+#### Deploy & Interact
+
+```bash
+# 1. Deploy program
+thru program create counter-v6 ./build/thruvm/bin/tn_counter_program_c.bin --authority frio
+
+# 2. Derive PDA address
+thru program derive-address <PROGRAM_ID> my-counter
+# → PDA address
+
+# 3. Generate state proof for account creation
+thru txn make-state-proof creating <PDA>
+# → proof_data_hex (104 bytes)
+
+# 4. Construct CREATE instruction data (use Python)
+PROOF_HEX=$(thru --json txn make-state-proof creating <PDA> | \
+  python3 -c "import json,sys; print(json.load(sys.stdin)['makeStateProof']['proof_data_hex'])")
+
+INSTR=$(python3 -c "
+import struct
+proof = bytes.fromhex('$PROOF_HEX')
+data = struct.pack('<I',0) + struct.pack('<H',2) + b'my-counter' + b'\x00'*22 + struct.pack('<I',len(proof)) + proof
+print(data.hex().upper())
+")
+
+# 5. Execute CREATE
+thru txn execute --fee 0 \
+  --readwrite-accounts <PDA> \
+  <PROGRAM_ID> \
+  $INSTR
+
+# 6. Execute INCREMENT (reusable)
+thru txn execute --fee 0 \
+  --readwrite-accounts <PDA> \
+  <PROGRAM_ID> \
+  010000000200
+```
+
+<br>
+
+### ⚠️ Common Pitfalls
+
+| Pitfall | Symptom | Fix |
+|---------|---------|-----|
+| Wrong entry point signature | `VM_FAILED` (-767) | Use `start(void)`, NOT `start(void*, ulong)` |
+| Hardcoded account index 0 | `VM_FAILED` (-767) | Use `account_index` from instruction data (usually 2) |
+| Missing state proof | `VM_REVERT` (0x1002) | Generate proof with `thru txn make-state-proof creating <addr>` |
+| Proof size mismatch | `VM_REVERT` (0x1000) | Ensure hex proof length matches `proof_size` field exactly |
+| Using `tsys_account_resize` without `tsys_account_create` | Account not found | Call `tsys_account_create` first for new accounts |
+
+> 💡 **Debugging**: Use `--json` flag to get detailed error codes. `vm_error=-767` = crash, `vm_error=-765` = revert with error code.
+
+<br>
+
 ---
 
 ## 📋 ABI System
@@ -754,16 +852,22 @@ Bits: 47-40  |  39-24   |  23-0
 
 | Code | Syscall | Description |
 |------|---------|-------------|
-| `0x01` | `account_create` | Create new account |
-| `0x02` | `account_resize` | Resize account data |
-| `0x03` | `account_delete` | Delete account |
-| `0x04` | `account_compress` | Compress account |
-| `0x05` | `account_decompress` | Decompress account |
-| `0x06` | `emit_event` | Emit event |
-| `0x07` | `exit` | Exit program |
-| `0x08` | `invoke` | Call another program (CPI) |
-| `0x09` | `log` | Log message |
-| `0x0A` | `set_writable` | Mark account writable |
+| `0x00` | `set_anonymous_segment_sz` | Set anonymous memory size |
+| `0x01` | `increment_anonymous_segment_sz` | Grow anonymous memory |
+| `0x02` | `set_account_data_writable` | Mark account writable |
+| `0x03` | `account_transfer` | Transfer tokens between accounts |
+| `0x04` | `account_create` | Create new account |
+| `0x05` | `account_create_ephemeral` | Create temporary account |
+| `0x06` | `account_delete` | Delete account |
+| `0x07` | `account_resize` | Resize account data |
+| `0x08` | `account_compress` | Compress account |
+| `0x09` | `account_decompress` | Decompress account |
+| `0x0A` | `invoke` | Call another program (CPI) |
+| `0x0B` | `exit` | Exit program (revert or return) |
+| `0x0C` | `log` | Log message |
+| `0x0D` | `emit_event` | Emit event |
+| `0x0E` | `account_set_flags` | Set account flags |
+| `0x0F` | `account_create_eoa` | Create EOA account |
 
 <br>
 
@@ -1433,14 +1537,15 @@ thru faucet request <name>  # Get testnet tokens
 <tr>
 <td width="50%">
 
-### 🔄 Counter Program v2
+### 🔄 Counter Program v6
 
 | Property | Value |
 |----------|-------|
-| **Address** | `taLBRGzlvDoOBRPZlwQeMMizFrjWdYNw3Dnauw37N62dbm` |
-| **Meta** | `ta2hkBlLSQMnOmx03aLuT4Qu-u0MnO95bnHrmHU50fMKkP` |
-| **Deployer** | `ta4xUEvMgPYGUiCrbX0az58_D4-j0lmwZEj_-Yb2-S2MrX` |
-| **Size** | 1162 bytes |
+| **Program** | `taE2wANaUFCpWJNexcbSMlaHmDvKLcP69tBrsNwO8uoMC8` |
+| **Meta** | `ta21YDcTEDUbvjmgfKa4yVO6zjadTcwpN_pTJdsMu6ngB9` |
+| **Seed** | `counter-v6` |
+| **Size** | 864 bytes |
+| **Source** | [`examples/tn_counter_program.c`](examples/tn_counter_program.c) |
 
 </td>
 <td width="50%">
@@ -1450,35 +1555,27 @@ thru faucet request <name>  # Get testnet tokens
 | Instruction | Type | Description |
 |-------------|------|-------------|
 | Create | `0` | Init counter to 0 |
-| Increment | `1` | Counter += 1 |
-| Decrement | `2` | Counter -= 1 (underflow protected) |
-| Reset | `3` | Counter = 0 |
+| Increment | `1` | Counter += 1 (emits event) |
 
 **Quick Test:**
 ```bash
-# Increment
+# 1. Derive PDA
+thru program derive-address taE2wANaUFCpWJNexcbSMlaHmDvKLcP69tBrsNwO8uoMC8 my-counter
+
+# 2. Make state proof
+thru txn make-state-proof creating <PDA>
+
+# 3. Create counter (use python to build instr data)
+# 4. Increment counter
 thru txn execute --fee 0 \
-  --readwrite-accounts <counter> \
-  taLBRGzlvDoOBRPZlwQeMMizFrjWdYNw3Dnauw37N62dbm \
+  --readwrite-accounts <PDA> \
+  taE2wANaUFCpWJNexcbSMlaHmDvKLcP69tBrsNwO8uoMC8 \
   010000000200
-
-# Decrement
-thru txn execute --fee 0 \
-  --readwrite-accounts <counter> \
-  taLBRGzlvDoOBRPZlwQeMMizFrjWdYNw3Dnauw37N62dbm \
-  020000000200
-
-# Reset
-thru txn execute --fee 0 \
-  --readwrite-accounts <counter> \
-  taLBRGzlvDoOBRPZlwQeMMizFrjWdYNw3Dnauw37N62dbm \
-  030000000200
 ```
 
 </td>
 </tr>
 </table>
-
 > 📁 Source code: [`examples/counter/`](examples/counter/)
 
 <br>

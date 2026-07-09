@@ -6,107 +6,67 @@
 static void handle_create_counter(uchar const *instruction_data, ulong instruction_data_sz TSDK_PARAM_UNUSED) {
     tn_counter_create_args_t const *args = (tn_counter_create_args_t const *)instruction_data;
 
+    /* Use account index from instruction arguments (index 0 is fee payer, index 1 is program) */
     ushort account_idx = args->account_index;
 
+    /* Get proof data pointer (follows the struct) */
     uchar const *proof_data = NULL;
     if (args->proof_size > 0) {
         proof_data = instruction_data + sizeof(tn_counter_create_args_t);
     }
 
+    /* Create the account using seed and proof from instruction data */
     ulong result = tsys_account_create(account_idx, args->counter_program_seed, proof_data, args->proof_size);
     if (result != TSDK_SUCCESS) {
         tsdk_revert(TN_COUNTER_ERR_ACCOUNT_CREATE_FAILED);
     }
 
+    /* Set account as writable so we can modify its data */
     result = tsys_set_account_data_writable(account_idx);
     if (result != TSDK_SUCCESS) {
         tsdk_revert(TN_COUNTER_ERR_ACCOUNT_SET_WRITABLE_FAILED);
     }
 
+    /* Resize account to hold counter data */
     result = tsys_account_resize(account_idx, sizeof(tn_counter_account_t));
     if (result != TSDK_SUCCESS) {
         tsdk_revert(TN_COUNTER_ERR_ACCOUNT_RESIZE_FAILED);
     }
 
-    void* account_data = tsdk_get_account_data_ptr(account_idx);
+    /* Get account data pointer and initialize counter */
+    void *account_data = tsdk_get_account_data_ptr(account_idx);
     if (account_data == NULL) {
         tsdk_revert(TN_COUNTER_ERR_ACCOUNT_DATA_ACCESS_FAILED);
     }
 
-    tn_counter_account_t* counter_account = (tn_counter_account_t*)account_data;
+    tn_counter_account_t *counter_account = (tn_counter_account_t *)account_data;
     counter_account->counter_value = 0UL;
 
     tsdk_return(TSDK_SUCCESS);
 }
 
 static void handle_increment_counter(uchar const *instruction_data, ulong instruction_data_sz TSDK_PARAM_UNUSED) {
-    tn_counter_simple_args_t const *args = (tn_counter_simple_args_t const *)instruction_data;
+    tn_counter_increment_args_t const *args = (tn_counter_increment_args_t const *)instruction_data;
 
     ushort account_idx = args->account_index;
 
-    void* account_data = tsdk_get_account_data_ptr(account_idx);
-    if (account_data == NULL) {
-        tsdk_revert(TN_COUNTER_ERR_ACCOUNT_DATA_ACCESS_FAILED);
-    }
-
+    /* Set account as writable so we can modify the counter value */
     ulong result = tsys_set_account_data_writable(account_idx);
     if (result != TSDK_SUCCESS) {
         tsdk_revert(TN_COUNTER_ERR_ACCOUNT_SET_WRITABLE_FAILED);
     }
 
-    tn_counter_account_t* counter_account = (tn_counter_account_t*)account_data;
+    /* Get account data pointer */
+    void *account_data = tsdk_get_account_data_ptr(account_idx);
+    if (account_data == NULL) {
+        tsdk_revert(TN_COUNTER_ERR_ACCOUNT_DATA_ACCESS_FAILED);
+    }
+
+    /* Increment the counter */
+    tn_counter_account_t *counter_account = (tn_counter_account_t *)account_data;
     counter_account->counter_value++;
 
-    tsys_emit_event((uchar const *)&counter_account->counter_value, sizeof(ulong));
-
-    tsdk_return(TSDK_SUCCESS);
-}
-
-static void handle_decrement_counter(uchar const *instruction_data, ulong instruction_data_sz TSDK_PARAM_UNUSED) {
-    tn_counter_simple_args_t const *args = (tn_counter_simple_args_t const *)instruction_data;
-
-    ushort account_idx = args->account_index;
-
-    void* account_data = tsdk_get_account_data_ptr(account_idx);
-    if (account_data == NULL) {
-        tsdk_revert(TN_COUNTER_ERR_ACCOUNT_DATA_ACCESS_FAILED);
-    }
-
-    tn_counter_account_t* counter_account = (tn_counter_account_t*)account_data;
-    if (counter_account->counter_value == 0) {
-        tsdk_revert(TN_COUNTER_ERR_COUNTER_UNDERFLOW);
-    }
-
-    ulong result = tsys_set_account_data_writable(account_idx);
-    if (result != TSDK_SUCCESS) {
-        tsdk_revert(TN_COUNTER_ERR_ACCOUNT_SET_WRITABLE_FAILED);
-    }
-
-    counter_account->counter_value--;
-
-    tsys_emit_event((uchar const *)&counter_account->counter_value, sizeof(ulong));
-
-    tsdk_return(TSDK_SUCCESS);
-}
-
-static void handle_reset_counter(uchar const *instruction_data, ulong instruction_data_sz TSDK_PARAM_UNUSED) {
-    tn_counter_simple_args_t const *args = (tn_counter_simple_args_t const *)instruction_data;
-
-    ushort account_idx = args->account_index;
-
-    void* account_data = tsdk_get_account_data_ptr(account_idx);
-    if (account_data == NULL) {
-        tsdk_revert(TN_COUNTER_ERR_ACCOUNT_DATA_ACCESS_FAILED);
-    }
-
-    ulong result = tsys_set_account_data_writable(account_idx);
-    if (result != TSDK_SUCCESS) {
-        tsdk_revert(TN_COUNTER_ERR_ACCOUNT_SET_WRITABLE_FAILED);
-    }
-
-    tn_counter_account_t* counter_account = (tn_counter_account_t*)account_data;
-    counter_account->counter_value = 0UL;
-
+    /* Emit increment event - emit just the counter value */
     tsys_emit_event((uchar const *)&counter_account->counter_value, sizeof(ulong));
 
     tsdk_return(TSDK_SUCCESS);
@@ -117,6 +77,7 @@ TSDK_ENTRYPOINT_FN void start(void) {
     uchar const *instruction_data = tsdk_txn_get_instr_data(txn);
     ulong instruction_data_sz = tsdk_txn_get_instr_data_sz(txn);
 
+    /* Check minimum size to safely read instruction type */
     if (instruction_data_sz < sizeof(uint)) {
         tsdk_revert(TN_COUNTER_ERR_INVALID_INSTRUCTION_DATA_SIZE);
     }
@@ -125,36 +86,33 @@ TSDK_ENTRYPOINT_FN void start(void) {
 
     switch (*instruction_type) {
         case TN_COUNTER_INSTRUCTION_CREATE:
+            /* Check minimum size to safely access struct fields */
             if (instruction_data_sz < sizeof(tn_counter_create_args_t)) {
                 tsdk_revert(TN_COUNTER_ERR_INVALID_INSTRUCTION_DATA_SIZE);
             }
+            tn_counter_create_args_t const *create_args = (tn_counter_create_args_t const *)instruction_data;
+            ulong expected_size = sizeof(tn_counter_create_args_t) + create_args->proof_size;
+
+            /* Check exact size including proof data */
+            if (instruction_data_sz != expected_size) {
+                tsdk_revert(TN_COUNTER_ERR_INVALID_INSTRUCTION_DATA_SIZE);
+            }
+
             handle_create_counter(instruction_data, instruction_data_sz);
             break;
 
         case TN_COUNTER_INSTRUCTION_INCREMENT:
-            if (instruction_data_sz != sizeof(tn_counter_simple_args_t)) {
+            /* Check exact instruction size */
+            if (instruction_data_sz != sizeof(tn_counter_increment_args_t)) {
                 tsdk_revert(TN_COUNTER_ERR_INVALID_INSTRUCTION_DATA_SIZE);
             }
             handle_increment_counter(instruction_data, instruction_data_sz);
-            break;
-
-        case TN_COUNTER_INSTRUCTION_DECREMENT:
-            if (instruction_data_sz != sizeof(tn_counter_simple_args_t)) {
-                tsdk_revert(TN_COUNTER_ERR_INVALID_INSTRUCTION_DATA_SIZE);
-            }
-            handle_decrement_counter(instruction_data, instruction_data_sz);
-            break;
-
-        case TN_COUNTER_INSTRUCTION_RESET:
-            if (instruction_data_sz != sizeof(tn_counter_simple_args_t)) {
-                tsdk_revert(TN_COUNTER_ERR_INVALID_INSTRUCTION_DATA_SIZE);
-            }
-            handle_reset_counter(instruction_data, instruction_data_sz);
             break;
 
         default:
             tsdk_revert(TN_COUNTER_ERR_INVALID_INSTRUCTION_TYPE);
     }
 
+    /* Should never reach here */
     tsdk_revert(TN_COUNTER_ERR_INVALID_INSTRUCTION_TYPE);
 }
