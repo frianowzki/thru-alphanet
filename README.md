@@ -1,1664 +1,235 @@
 <p align="center">
   <img src="https://img.shields.io/badge/status-alphanet-yellow?style=for-the-badge&labelColor=1a1a2e" alt="Status">
-  <img src="https://img.shields.io/badge/thru-v0.2.38-blue?style=for-the-badge&labelColor=1a1a2e" alt="Version">
   <img src="https://img.shields.io/badge/RISC--V-64--bit-orange?style=for-the-badge&labelColor=1a1a2e" alt="VM">
   <img src="https://img.shields.io/badge/license-MIT-green?style=for-the-badge&labelColor=1a1a2e" alt="License">
 </p>
 
-<h1 align="center">
-  <br>
-  🕊️ Thru Alphanet
-  <br>
-</h1>
+<h1 align="center">🕊️ Thru Alphanet</h1>
 
 <p align="center">
-  <b>Complete Developer Guide</b><br>
-  <sub>Build ultra-high performance programs on Thru</sub>
+  <b>Build ultra-high performance programs on Thru</b><br>
+  <sub>C SDK · RISC-V VM · Sub-ms latency · On-chain programs</sub>
 </p>
 
 <p align="center">
-  <a href="https://docs.thru.org">Docs</a> •
-  <a href="https://github.com/Unto-Labs/thru">GitHub</a> •
-  <a href="https://scan.thru.org">Explorer</a> •
-  <a href="https://docs.thru.org/llms-full.txt">LLM Docs</a>
+  <a href="https://docs.thru.org">Docs</a> ·
+  <a href="https://github.com/Unto-Labs/thru">GitHub</a> ·
+  <a href="https://scan.thru.org">Explorer</a>
 </p>
 
-<br>
-
 ---
 
-## 📋 Table of Contents
-
-<details>
-<summary><b>🚀 Getting Started</b></summary>
-
-- [What is Thru](#-what-is-thru)
-- [Quick Start](#-quick-start)
-- [DevKit Setup](#-devkit-setup)
-- [Configuration](#-configuration)
-
-</details>
-
-<details>
-<summary><b>🛠️ Development</b></summary>
-
-- [Program Development (C SDK)](#-program-development-c-sdk)
-- [Complete Counter Walkthrough](#-complete-counter-walkthrough)
-- [Common Pitfalls](#️-common-pitfalls)
-- [ABI System](#-abi-system)
-- [Core Concepts](#-core-concepts)
-
-</details>
-
-<details>
-<summary><b>⚙️ Architecture</b></summary>
-
-- [Virtual Machine (ThruVM)](#-virtual-machine-thruvm)
-- [Runtime & Execution](#-runtime--execution)
-- [Accounts & State](#-accounts--state)
-
-</details>
-
-<details>
-<summary><b>🔌 Integration</b></summary>
-
-- [SDKs & Packages](#-sdks--packages)
-- [APIs (gRPC, REST, MCP)](#-apis)
-- [Wallet & Passkey](#-wallet--passkey)
-
-</details>
-
-<details>
-<summary><b>📦 On-Chain Programs</b></summary>
-
-- [Counter Program v7](#-counter-program-v7)
-- [Voting Program v4](#-voting-program-v4)
-- [Escrow Program v1](#-escrow-program-v1)
-- [Token Program](#-token-program)
-- [Token Program Flow (FRIO Example)](#-token-program-flow-frio-example)
-- [NFT Program](#-nft-program)
-
-</details>
-
-<details>
-<summary><b>🤖 AI & Automation</b></summary>
-
-- [Building with AI Agents](#-building-with-ai-agents)
-- [Telegram Bot](#-telegram-bot)
-- [MCP Server](#-mcp-server)
-- [Faucet & Airdrop Tools](#-faucet--airdrop-tools)
-- [Useful Commands](#-useful-commands-cheat-sheet)
-- [Deployed Programs](#-deployed-programs)
-
-</details>
-
-<details>
-<summary><b>🌐 Frontend</b></summary>
-
-- [Counter Frontend](#-counter-frontend)
-
-</details>
-
-<br>
-
----
-
-## 🌟 What is Thru
-
-<p align="center">
-  <img src="https://img.shields.io/badge/ULTRA--HIGH_PERFORMANCE-sub--ms_latency-critical?style=flat-square&labelColor=0d1117&color=critical" alt="Performance">
-  <img src="https://img.shields.io/badge/RISC--V_VM-native_execution-success?style=flat-square&labelColor=0d1117" alt="VM">
-  <img src="https://img.shields.io/badge/C_SDK-native_programs-informational?style=flat-square&labelColor=0d1117" alt="SDK">
-</p>
-
-<br>
-
-**Thru** is a next-generation blockchain network built for developers who need enterprise-grade speed and reliability.
-
-<table>
-<tr>
-<td width="50%">
-
-### ✨ Key Features
-
-- **⚡ Sub-millisecond latency** — industry-leading transaction speed
-- **🔧 RISC-V VM** — native 64-bit execution environment
-- **📦 C Programs** — write smart contracts in C
-- **🗜️ State Compression** — efficient storage with Merkle proofs
-- **🤖 AI-Ready** — MCP tools for coding agents
-- **🌐 gRPC + REST** — high-performance APIs
-
-</td>
-<td width="50%">
-
-### 📊 Why Thru?
-
-| | Thru | Others |
-|---|:---:|:---:|
-| **VM** | RISC-V | EVM/WASM |
-| **Language** | C | Solidity |
-| **Latency** | `<1ms` | `1s+` |
-| **State Model** | Accounts + Compress | Accounts |
-| **AI Support** | Native MCP | Limited |
-
-</td>
-</tr>
-</table>
-
-<br>
-
----
-
-## ⚡ Quick Start
-
-<br>
-
-<table>
-<tr>
-<td width="60%">
-
-### 🚀 Get Running in 60 Seconds
+## Quick Start
 
 ```bash
-# 1. Install CLI
-npm i -g thru
-
-# 2. Verify installation
-thru --help
-
-# 3. Check network
-thru getversion
-
-# 4. Generate keypair
-thru keys generate default
-
-# 5. Create account
-thru account create default
-
-# 6. Get testnet tokens
-thru faucet withdraw default 10000
+npm i -g thru                              # install CLI
+thru keys generate default                 # generate keypair
+thru account create default                # create account
+thru faucet withdraw default 10000         # get testnet tokens
 ```
 
-</td>
-<td width="40%">
-
-### 📦 Installation Options
-
-| Method | Command |
-|--------|---------|
-| **npm** | `npm i -g thru` |
-| **deb** | `apt install ./thru_*.deb` |
-| **rpm** | `dnf install ./thru-*.rpm` |
-
-<br>
-
-> 💡 **npm** is recommended — no Rust toolchain needed
-
-</td>
-</tr>
-</table>
-
-<br>
-
----
-
-## 🛠️ DevKit Setup
-
-<br>
-
-### Prerequisites
-
-| Requirement | Version | Notes |
-|------------|---------|-------|
-| **Node.js** | 18+ | [nodejs.org](https://nodejs.org) |
-| **OS** | Linux x64 | Recommended for full toolchain |
-| **macOS** | ARM64/x64 | CLI works, limited toolchain |
-| **Windows** | x64 | CLI works via WSL |
-
-<br>
-
-### Full Setup
+## DevKit
 
 ```bash
-# Install CLI globally
-npm i -g thru
-
-# Install RISC-V cross-compilation toolchain
-thru dev toolchain install
-
-# Install C SDK
-thru dev sdk install c
-
-# Verify everything
-thru --help
+thru dev toolchain install                 # RISC-V compiler
+thru dev sdk install c                     # C SDK headers + libs
 ```
 
-<br>
+SDK paths:
+- Headers: `~/.thru/sdk/c/thru-sdk/include/`
+- Compiler: `~/.thru/sdk/toolchain/bin/riscv64-unknown-elf-gcc`
 
-### 📁 SDK Locations
-
-```
-~/.thru/
-├── cli/
-│   └── config.yaml          # CLI configuration + keys
-├── sdk/
-│   ├── c/
-│   │   └── thru-sdk/        # C SDK files
-│   │       ├── include/      # Headers
-│   │       ├── lib/          # Libraries
-│   │       └── thru_c_program.mk  # Build rules
-│   └── toolchain/           # RISC-V compiler
-```
-
-<br>
-
----
-
-## 🔧 Configuration
-
-<br>
-
-### CLI Config (`~/.thru/cli/config.yaml`)
-
-```yaml
-# RPC endpoint (alphanet default)
-rpc_base_url: https://rpc.alphanet.thru.org
-
-# Keypairs (generated by `thru keys generate`)
-keys:
-  default:
-    public: tayzC11YgWrPpXBon_hBxI_...
-    private: <hex_encoded_private_key>  # ⚠️ NEVER SHARE
-```
-
-<br>
-
-> ⚠️ **Security Warning**: Private keys are stored as plaintext hex. Never commit this file to version control.
-
-<br>
-
----
-
-## 🚀 Program Development (C SDK)
-
-<br>
-
-<table>
-<tr>
-<td width="50%">
-
-### 📁 Project Structure
+## Project Structure
 
 ```
-my-project/
-├── GNUmakefile
-└── examples/
-    ├── Local.mk
-    ├── my_program.h
-    └── my_program.c
+thru-alphanet/
+├── examples/counter/        # On-chain programs (C)
+│   ├── tn_counter_v7.c     # Counter (create/increment/decrement/reset/read)
+│   ├── tn_voting.c         # Voting (create/cast/close/results)
+│   └── tn_escrow.c         # Escrow (create/release/dispute/refund/read)
+├── thru-bot/                # Telegram bot + tools
+│   ├── bot.py              # Telegram bot
+│   ├── faucet.py           # Testnet faucet
+│   └── airdrop.py          # Bulk airdrop
+├── thru-mcp/                # MCP server for AI agents
+│   └── server.py
+├── thru-frontend/           # Web UI
+│   └── index.html
+└── thru-wallet/             # Multi-address wallet
+    ├── wallet.js           # Wallet adapter
+    └── cli.js              # CLI interface
 ```
 
-</td>
-<td width="50%">
-
-### 🔨 Build Commands
+## Building Programs
 
 ```bash
-# Build program
-make
-
-# Verify output
-ls build/thruvm/bin/
-
-# Deploy to network
-thru program create my_seed \
-  ./build/thruvm/bin/my_program_c.bin
-
-# Upgrade existing
-thru program upgrade my_seed \
-  ./build/thruvm/bin/my_program_c.bin
+make -j                                          # build
+thru program create <seed> build/thruvm/bin/*.bin # deploy
+thru program derive-address <prog> <seed>         # derive PDA
 ```
 
-</td>
-</tr>
-</table>
-
-<br>
-
-### 📄 GNUmakefile
-
-```makefile
-BASEDIR:=$(CURDIR)/build
-THRU_C_SDK_DIR:=$(HOME)/.thru/sdk/c/thru-sdk
-include $(THRU_C_SDK_DIR)/thru_c_program.mk
-```
-
-### 📄 examples/Local.mk
-
-```makefile
-$(call make-bin,my_program_c,my_program,,-ltn_sdk)
-```
-
-<br>
-
-### 📝 Program Header (.h)
-
-```c
-#ifndef MY_PROGRAM_H
-#define MY_PROGRAM_H
-
-#include <thru-sdk/c/tn_sdk.h>
-
-/* Error codes */
-#define MY_ERR_INVALID_DATA   (0x1000UL)
-#define MY_ERR_CREATE_FAILED  (0x1001UL)
-
-/* Instruction types */
-#define MY_INSTRUCTION_INIT   (0U)
-#define MY_INSTRUCTION_UPDATE (1U)
-
-/* Account data structure */
-typedef struct __attribute__((packed)) {
-    ulong value;
-} my_account_t;
-
-#endif
-```
-
-<br>
-
-### 📝 Program Implementation (.c)
+### C Program Template
 
 ```c
 #include <thru-sdk/c/tn_sdk.h>
 #include <thru-sdk/c/tn_sdk_syscall.h>
-#include "my_program.h"
 
 TSDK_ENTRYPOINT_FN void start(void) {
     tsdk_txn_t const *txn = tsdk_get_txn();
     uchar const *data = tsdk_txn_get_instr_data(txn);
     ulong data_sz = tsdk_txn_get_instr_data_sz(txn);
 
-    /* Validate input */
-    if (data_sz < sizeof(uint)) {
-        tsdk_revert(MY_ERR_INVALID_DATA);
-    }
-
     uint const *instr_type = (uint const *)data;
 
     switch (*instr_type) {
-        case MY_INSTRUCTION_INIT: {
-            ushort account_idx = *(ushort *)(data + sizeof(uint));
-
-            /* Create account with state proof */
-            ulong result = tsys_account_create(account_idx, seed, proof, proof_sz);
-            if (result != TSDK_SUCCESS) tsdk_revert(MY_ERR_CREATE_FAILED);
-
-            /* Initialize */
-            tsys_set_account_data_writable(account_idx);
-            tsys_account_resize(account_idx, sizeof(my_account_t));
-            my_account_t *acct = (my_account_t *)tsdk_get_account_data_ptr(account_idx);
-            acct->value = 0;
-
-            tsdk_return(TSDK_SUCCESS);
-            break;
-        }
-        case MY_INSTRUCTION_UPDATE: {
-            ushort account_idx = *(ushort *)(data + sizeof(uint));
-            tsys_set_account_data_writable(account_idx);
-            my_account_t *acct = (my_account_t *)tsdk_get_account_data_ptr(account_idx);
-            acct->value++;
-
-            /* Emit event */
-            tsys_emit_event((uchar const *)&acct->value, sizeof(ulong));
-            tsdk_return(TSDK_SUCCESS);
-            break;
-        }
-        default:
-            tsdk_revert(MY_ERR_INVALID_DATA);
+        case 0: /* create */ break;
+        case 1: /* action */ break;
+        default: tsdk_revert(0x1000);
     }
+    tsdk_return(TSDK_SUCCESS);
 }
 ```
 
-<br>
+### Common Errors
 
-### 🔑 Key SDK Functions
+| Error | Cause | Fix |
+|-------|-------|-----|
+| `vm_error=-767` | Wrong entry point | Use `start(void)`, not `start(void*,ulong)` |
+| `vm_error=-765` | Meta account conflict | Use account_index from instr data (usually 2) |
+| `error=0x1000` | Bad instruction data | Check struct size matches hex |
+| `error=0x1002` | Missing state proof | `thru txn make-state-proof creating <addr>` |
 
-| Function | Description |
-|----------|-------------|
-| `tsdk_get_txn()` | Get current transaction |
-| `tsdk_txn_get_instr_data()` | Get instruction data bytes |
-| `tsdk_get_account_data_ptr()` | Get pointer to account data |
-| `tsdk_return(TSDK_SUCCESS)` | Exit program successfully |
-| `tsdk_revert(error_code)` | Exit with error (revert) |
-| `tsys_account_create()` | Create new on-chain account |
-| `tsys_account_resize()` | Resize account data buffer |
-| `tsys_set_account_data_writable()` | Mark account as writable |
-| `tsys_account_compress()` | Compress account (save storage) |
-| `tsys_account_decompress()` | Decompress account |
-| `tsys_emit_event()` | Emit event to chain |
+## Deployed Programs
 
-<br>
+| Program | Address | Source |
+|---------|---------|--------|
+| Counter v7 | `ta2sYKmgW-b0FQEP2-pMYROxnAIMTrZTgpJqgVvxAHe423` | `tn_counter_v7.c` |
+| Voting v4 | `taH5gAKRdirmY8kImoKAeW4lzk6fZCJbbNm6eLDtYcJxoo` | `tn_voting.c` |
+| Escrow v1 | `taYRu8D8yaZksfNK42mTXIpbqVcmgS6Zr0agCeqOpBSOaL` | `tn_escrow.c` |
 
-### 🎯 Complete Counter Walkthrough
-
-Full step-by-step guide to build, deploy, and interact with a counter program.
-
-#### Account Indexing
-
-When your program executes, accounts are ordered in the transaction array:
-
-```
-┌─────────────────────────────────────────┐
-│  0: Fee Payer       (pays for execution)│
-│  1: Program         (code to execute)   │
-│  2+: Writable Accts (sorted by hex key) │
-│  N+: Read-only Accts (sorted by hex key)│
-└─────────────────────────────────────────┘
-```
-
-> 💡 **Key insight**: Your program reads instruction data via `tsdk_get_txn()`, NOT via function arguments. The entry point is `start(void)`.
-
-#### Instruction Data Format
-
-**Create Counter** (instruction_type = 0):
-```c
-typedef struct __attribute__((packed)) {
-    uint instruction_type;                    // 4 bytes (0)
-    ushort account_index;                     // 2 bytes (2 = first writable)
-    uchar counter_program_seed[TN_SEED_SIZE]; // 32 bytes
-    uint proof_size;                          // 4 bytes
-    /* proof_data follows dynamically */
-} tn_counter_create_args_t;
-// Total fixed: 42 bytes + proof_size
-```
-
-**Increment Counter** (instruction_type = 1):
-```c
-typedef struct __attribute__((packed)) {
-    uint instruction_type;  // 4 bytes (1)
-    ushort account_index;   // 2 bytes (2)
-} tn_counter_increment_args_t;
-// Total: 6 bytes
-```
-
-#### Deploy & Interact
+### Counter Usage
 
 ```bash
-# 1. Deploy program
-thru program create counter-v6 ./build/thruvm/bin/tn_counter_program_c.bin --authority frio
+# derive PDA
+thru program derive-address ta2sYKmgW-b0FQEP2-pMYROxnAIMTrZTgpJqgVvxAHe423 my-counter
 
-# 2. Derive PDA address
-thru program derive-address <PROGRAM_ID> my-counter
-# → PDA address
+# increment
+thru txn execute --fee 0 --readwrite-accounts <PDA> ta2sYKmgW-b0FQEP2-pMYROxnAIMTrZTgpJqgVvxAHe423 010000000200
 
-# 3. Generate state proof for account creation
-thru txn make-state-proof creating <PDA>
-# → proof_data_hex (104 bytes)
+# decrement
+thru txn execute --fee 0 --readwrite-accounts <PDA> ta2sYKmgW-b0FQEP2-pMYROxnAIMTrZTgpJqgVvxAHe423 020000000200
 
-# 4. Construct CREATE instruction data (use Python)
-PROOF_HEX=$(thru --json txn make-state-proof creating <PDA> | \
-  python3 -c "import json,sys; print(json.load(sys.stdin)['makeStateProof']['proof_data_hex'])")
+# reset
+thru txn execute --fee 0 --readwrite-accounts <PDA> ta2sYKmgW-b0FQEP2-pMYROxnAIMTrZTgpJqgVvxAHe423 030000000200
 
-INSTR=$(python3 -c "
-import struct
-proof = bytes.fromhex('$PROOF_HEX')
-data = struct.pack('<I',0) + struct.pack('<H',2) + b'my-counter' + b'\x00'*22 + struct.pack('<I',len(proof)) + proof
-print(data.hex().upper())
-")
-
-# 5. Execute CREATE
-thru txn execute --fee 0 \
-  --readwrite-accounts <PDA> \
-  <PROGRAM_ID> \
-  $INSTR
-
-# 6. Execute INCREMENT (reusable)
-thru txn execute --fee 0 \
-  --readwrite-accounts <PDA> \
-  <PROGRAM_ID> \
-  010000000200
+# read
+thru txn execute --fee 0 --readwrite-accounts <PDA> ta2sYKmgW-b0FQEP2-pMYROxnAIMTrZTgpJqgVvxAHe423 040000000200
 ```
 
-<br>
+## Wallet
 
-### ⚠️ Common Pitfalls
-
-| Pitfall | Symptom | Fix |
-|---------|---------|-----|
-| Wrong entry point signature | `VM_FAILED` (-767) | Use `start(void)`, NOT `start(void*, ulong)` |
-| Hardcoded account index 0 | `VM_FAILED` (-767) | Use `account_index` from instruction data (usually 2) |
-| Missing state proof | `VM_REVERT` (0x1002) | Generate proof with `thru txn make-state-proof creating <addr>` |
-| Proof size mismatch | `VM_REVERT` (0x1000) | Ensure hex proof length matches `proof_size` field exactly |
-| Using `tsys_account_resize` without `tsys_account_create` | Account not found | Call `tsys_account_create` first for new accounts |
-
-> 💡 **Debugging**: Use `--json` flag to get detailed error codes. `vm_error=-767` = crash, `vm_error=-765` = revert with error code.
-
-<br>
-
----
-
-## 📋 ABI System
-
-<br>
-
-<details>
-<summary><b>📖 What is ABI?</b></summary>
-
-ABI (Application Binary Interface) defines the binary data layout for:
-- **Instructions** — what operations programs accept
-- **Account State** — how data is stored on-chain
-
-ABIs on Thru are **handwritten YAML files** that must be validated before publishing.
-
-</details>
-
-<br>
-
-### 📝 ABI YAML Structure
-
-```yaml
-abi:
-  package: my.program.name
-  name: "My Program"
-  abi-version: 1
-  package-version: 1.0.0
-  description: "Description here"
-  imports: []
-  options:
-    program-metadata:
-      instruction-root: "MyInstruction"
-      account-root: "MyAccount"
-      errors: "MyError"
-      events: "MyEvent"
-
-types:
-  - name: MyInstruction
-    kind:
-      struct:
-        packed: true
-        fields:
-          - name: tag
-            field-type:
-              primitive: u8
-          - name: payload
-            field-type:
-              enum:
-                packed: true
-                variants:
-                  - name: Init
-                    fields:
-                      - name: seed
-                        field-type:
-                          primitive: u8
-                  - name: Update
-                    fields:
-                      - name: value
-                        field-type:
-                          primitive: u64
-```
-
-<br>
-
-### 🔄 ABI Workflow
-
-```
-┌─────────┐     ┌──────────┐     ┌──────────┐     ┌──────────┐
-│  Write  │ ──▶ │ Validate │ ──▶ │  Codegen │ ──▶ │ Publish  │
-│  YAML   │     │  Analyze │     │  TS/C/Rs │     │  On-Chain│
-└─────────┘     └──────────┘     └──────────┘     └──────────┘
-```
+Multi-address wallet adapter for Thru Alphanet.
 
 ```bash
-# 1. Validate ABI
-thru abi analyze ./program.abi.yaml
+cd thru-wallet && npm install
 
-# 2. Generate client code
-thru abi codegen \
-  --files ./program.abi.yaml \
-  --language typescript \
-  --output ./generated/
-
-# 3. Publish to chain
-thru abi account create my_seed ./program.abi.yaml
-
-# 4. Verify published ABI
-thru abi account get --include-data <ABI_ADDRESS>
+node cli.js generate                        # generate new keypair
+node cli.js add alice taFXv...Hv            # add existing address
+node cli.js list                            # list all addresses
+node cli.js switch alice                    # set active address
+node cli.js balance                         # check active balance
+node cli.js balance bob                     # check specific address
+node cli.js pda <program> <seed>            # derive PDA
 ```
 
-<br>
+### Keystore
 
----
+Saved to `~/.thru/keystore/wallet.json`:
 
-## 🧠 Core Concepts
-
-<br>
-
-### 🏦 Account Model
-
-<table>
-<tr>
-<td width="50%">
-
-**Every piece of state is an Account**
-
-| Property | Description |
-|----------|-------------|
-| **Address** | Unique ID (starts with `ta`) |
-| **Data** | Binary payload |
-| **Owner** | Controlling program |
-| **Flags** | Compressed, writable, etc. |
-
-</td>
-<td width="50%">
-
-**Account Lifecycle**
-
-```
-    ┌─────────┐
-    │ Create  │
-    └────┬────┘
-         ▼
-    ┌─────────┐
-    │ Active  │ ◄──────────────┐
-    └────┬────┘                │
-         │                     │
-         ▼                     │
-    ┌──────────┐          ┌────┴─────┐
-    │ Compress │          │Decompress│
-    └──────────┘          └──────────┘
-         │
-         ▼
-    ┌─────────┐
-    │ Archive │
-    └─────────┘
-```
-
-</td>
-</tr>
-</table>
-
-<br>
-
-### 🔑 Program-Derived Addresses (PDAs)
-
-Accounts can be **deterministically derived** from a program + seed:
-
-```bash
-# Derive address
-thru program derive-address <program_address> <seed>
-
-# Convert seed to hex
-thru program seed-to-hex <seed>
-```
-
-> 💡 Same seed always produces the same address — no on-chain lookup needed
-
-<br>
-
-### 📜 State Proofs
-
-Cryptographic proofs verify account existence in the Merkle tree:
-
-```bash
-# Generate proof for account creation
-thru txn make-state-proof creating <account_address>
-
-# Proof types
-# ├── creating   — prove account doesn't exist yet
-# ├── existing   — prove account exists (for decompress)
-# └── updating   — prove account state (for re-compress)
-```
-
-<br>
-
-### 📨 Transaction Structure
-
-```
-┌─────────────────────────────────────────┐
-│  0: Fee Payer       (pays for execution)│
-│  1: Program         (code to execute)   │
-│  2+: Writable Accts (can modify)        │
-│  N+: Read-only Accts (can only read)    │
-└─────────────────────────────────────────┘
-```
-
-```bash
-thru txn execute \
-  --fee 0 \
-  --readwrite-accounts <writable_account> \
-  <program_address> \
-  <hex_instruction_data>
-```
-
-<br>
-
-### 💰 Compute Units (CUs)
-
-Each transaction consumes compute units:
-
-| Resource | CU Cost |
-|----------|---------|
-| Base transaction | 500 |
-| Per instruction | Varies |
-| Memory allocation | Per page |
-| Account creation | Per account |
-
-<br>
-
----
-
-## ⚙️ Virtual Machine (ThruVM)
-
-<br>
-
-<table>
-<tr>
-<td width="50%">
-
-### 🔧 RISC-V Extensions
-
-| Extension | Purpose |
-|-----------|---------|
-| **RV64I** | Base integer (64-bit) |
-| **M** | Multiply/divide |
-| **C** | Compressed instructions (16-bit) |
-| **B** | Bit manipulation |
-| **Zknh** | SHA-256/512 acceleration |
-
-</td>
-<td width="50%">
-
-### 📐 Key Constraints
-
-| Constraint | Value |
-|------------|-------|
-| IALIGN | 16-bit |
-| Page Size | 4KB |
-| Max Stack | 16MB |
-| Max Heap | 16MB |
-| Threads | Single |
-| Alignment | Strict |
-
-</td>
-</tr>
-</table>
-
-<br>
-
-### 🧮 Memory Layout (48-bit Segmented)
-
-```
-Bits: 47-40  |  39-24   |  23-0
-     seg_type| seg_idx  | offset
-    (8 bits) |(16 bits) |(24 bits)
-```
-
-| Type | Name | Purpose |
-|------|------|---------|
-| `0x00` | Read-Only | TXN data, program code, block context |
-| `0x02` | Account Meta | Account metadata |
-| `0x03` | Account Data | Page-based data (COW) |
-| `0x04` | Events | Event emission buffer |
-| `0x05` | Stack | Grows ↓ (16MB) |
-| `0x07` | Heap | Grows ↑ (16MB) |
-
-<br>
-
-### 📦 Executable Format
-
-```
-┌──────────────┐
-│   Header     │  8 bytes (magic + version + size)
-├──────────────┤
-│   Bytecode   │  RISC-V instructions
-├──────────────┤
-│   Footer     │  4 bytes (checksum)
-└──────────────┘
-```
-
-<br>
-
----
-
-## 🔄 Runtime & Execution
-
-<br>
-
-### 📊 Execution Flow
-
-```
-┌─────────────┐
-│  Deserialize│
-│  Transaction│
-└──────┬──────┘
-       ▼
-┌─────────────┐
-│   Validate  │
-│   Accounts  │
-└──────┬──────┘
-       ▼
-┌─────────────┐
-│  Setup VM   │
-│  Memory     │
-└──────┬──────┘
-       ▼
-┌─────────────┐
-│   Execute   │
-│  Bytecode   │
-└──────┬──────┘
-       ▼
-┌─────────────┐
-│   Apply/    │
-│   Revert    │
-└──────┬──────┘
-       ▼
-┌─────────────┐
-│   Commit    │
-│   State     │
-└─────────────┘
-```
-
-<br>
-
-### 📞 System Calls
-
-| Code | Syscall | Description |
-|------|---------|-------------|
-| `0x00` | `set_anonymous_segment_sz` | Set anonymous memory size |
-| `0x01` | `increment_anonymous_segment_sz` | Grow anonymous memory |
-| `0x02` | `set_account_data_writable` | Mark account writable |
-| `0x03` | `account_transfer` | Transfer tokens between accounts |
-| `0x04` | `account_create` | Create new account |
-| `0x05` | `account_create_ephemeral` | Create temporary account |
-| `0x06` | `account_delete` | Delete account |
-| `0x07` | `account_resize` | Resize account data |
-| `0x08` | `account_compress` | Compress account |
-| `0x09` | `account_decompress` | Decompress account |
-| `0x0A` | `invoke` | Call another program (CPI) |
-| `0x0B` | `exit` | Exit program (revert or return) |
-| `0x0C` | `log` | Log message |
-| `0x0D` | `emit_event` | Emit event |
-| `0x0E` | `account_set_flags` | Set account flags |
-| `0x0F` | `account_create_eoa` | Create EOA account |
-
-<br>
-
----
-
-## 🏦 Accounts & State
-
-<br>
-
-### 🗜️ Account Compression
-
-```c
-// Compress account (archive to Merkle tree)
-tsys_account_compress(account_idx, proof, proof_sz);
-
-// Decompress account (restore from proof)
-tsys_account_decompress(account_idx, proof, proof_sz);
-```
-
-| State | Storage | Access |
-|-------|---------|--------|
-| **Uncompressed** | Validator memory | Direct |
-| **Compressed** | Off-chain (Merkle) | Via proof |
-
-<br>
-
----
-
-## 📦 SDKs & Packages
-
-<br>
-
-### 🟢 NPM Packages
-
-<table>
-<tr>
-<td>
-
-```bash
-npm i @thru/sdk
-```
-
-**`@thru/sdk`** — TypeScript/JS client
-- Blocks, accounts, transactions
-- Events, proofs
-- Typed domain models
-
-</td>
-<td>
-
-```bash
-npm i @thru/programs
-```
-
-**`@thru/programs`** — On-chain programs
-- Token program bindings
-- Instruction builders
-- Address derivation
-
-</td>
-<td>
-
-```bash
-npm i @thru/passkey
-```
-
-**`@thru/passkey`** — Passkey/WebAuthn
-- Registration & signing
-- Mobile helpers
-- Auth flows
-
-</td>
-</tr>
-<tr>
-<td>
-
-```bash
-npm i @thru/indexer
-```
-
-**`@thru/indexer`** — Indexer framework
-- Drizzle-backed
-- Stream definitions
-- Background indexing
-
-</td>
-<td>
-
-```bash
-npm i @thru/replay
-```
-
-**`@thru/replay`** — Chain replay
-- Historical backfill
-- Live streaming
-- No gaps/duplicates
-
-</td>
-<td>
-
-```bash
-# Rust crates
-cargo add thru-base
-cargo add thru-grpc-client
-```
-
-**Rust SDKs**
-- `thru-base` — Core primitives
-- `thru-grpc-client` — gRPC bindings
-
-</td>
-</tr>
-</table>
-
-<br>
-
----
-
-## 🔌 APIs
-
-<br>
-
-### ⚡ gRPC API (Recommended)
-
-High-performance Protocol Buffers API:
-
-```text
-Endpoint: https://grpc.alphanet.thru.org
-```
-
-| Service | Purpose |
-|---------|---------|
-| **CommandService** | Send transactions, batch operations |
-| **QueryService** | Get blocks, accounts, transactions |
-| **StreamingService** | Real-time streams |
-| **DebugService** | Transaction debugging |
-
-<br>
-
-### 🌐 REST API
-
-Browser-friendly JSON API:
-
-```text
-Endpoint: https://rpc.alphanet.thru.org
-```
-
-<br>
-
-### 🤖 Explorer MCP (AI Agents)
-
-Live chain context for coding agents:
-
-```bash
-# Claude Code
-claude mcp add --transport http thru-explorer https://scan.thru.org/api/mcp
-
-# Codex
-# Add to config:
-# mcpServers:
-#   thru-explorer:
-#     url: https://scan.thru.org/api/mcp
-```
-
-**Available Tools:**
-
-| Tool | Description |
-|------|-------------|
-| `get_block` | Fetch block details |
-| `get_transaction` | Fetch transaction details |
-| `get_account` | Fetch account state |
-| `list_recent_blocks` | Recent blocks |
-| `list_recent_transactions` | Recent transactions |
-| `search` | Search chain state |
-| `get_program_abi` | Fetch program ABI |
-
-<br>
-
----
-
-## 🔐 Wallet & Passkey
-
-<br>
-
-### 🛡️ Passkey Manager Program
-
-On-chain program for WebAuthn/passkey authorization:
-
-```
-┌─────────────────────────────────────────────┐
-│              Passkey Flow                    │
-├─────────────────────────────────────────────┤
-│  1. Register passkey (WebAuthn credential)  │
-│  2. Build challenge (nonce + accounts +     │
-│     instructions)                           │
-│  3. Sign with passkey (user device)         │
-│  4. Verify on-chain (program)               │
-└─────────────────────────────────────────────┘
-```
-
-| Account | Purpose |
-|---------|---------|
-| `WalletAccount` | Wallet state + nonce |
-| `CredentialLookup` | Passkey credential mapping |
-
-<br>
-
-### 🔑 Scoped Approvals (New)
-
-Wallet signing sessions with scoped approvals:
-- Authorize **specific actions** per session
-- Don't need to sign **every transaction**
-- Better UX for repeated operations
-
-```bash
-npm i @thru/passkey @thru/programs
-```
-
-<br>
-
----
-
-## 🪙 Token Program
-
-<br>
-
-### 📊 Token Accounts
-
-| Account | Size | Purpose |
-|---------|------|---------|
-| `TokenMintAccount` | 115 bytes | Mint metadata + supply |
-| `TokenAccount` | 73 bytes | Individual balance |
-
-### 📝 Instructions
-
-| Tag | Instruction | Description |
-|-----|-------------|-------------|
-| `0` | `initialize_mint` | Create new token mint |
-| `1` | `initialize_account` | Create token account |
-| `2` | `transfer` | Transfer tokens |
-| `3` | `mint_to` | Mint new tokens |
-| `4` | `burn` | Burn tokens |
-| `5` | `close_account` | Close token account |
-| `6` | `freeze_account` | Freeze account |
-| `7` | `thaw_account` | Unfreeze account |
-
-<br>
-
-### ⚠️ Known Limitations
-
-| Feature | Status | Notes |
-|---------|--------|-------|
-| `set_authority` | ❌ Not implemented | On-chain program doesn't support |
-| `revoke_authority` | ❌ Not implemented | On-chain program doesn't support |
-| Multi-sig | ❌ Not implemented | — |
-
-> These features exist in SPL Token (Solana) but are **not yet implemented** in Thru's token program.
-
-<br>
-
----
-
-## 🪙 Token Program Flow (FRIO Example)
-
-<br>
-
-Complete walkthrough of creating, transferring, burning, and freezing a token.
-
-### 1️⃣ Create Mint
-
-```bash
-# Generate seed
-SEED=$(python3 -c "import secrets; print(secrets.token_hex(32))")
-
-# Create mint (9 decimals, with freeze authority)
-thru token initialize-mint \
-  <CREATOR_ADDRESS> \
-  FRIO \
-  $SEED \
-  --decimals 9 \
-  --freeze-authority <FREEZE_AUTHORITY_ADDRESS> \
-  --json
-```
-
-**Response:**
 ```json
 {
-  "token_initialize_mint": {
-    "status": "success",
-    "mint_account": "ta5YmaFApl_3d8d92gVRPVNCZldHxUtgXMTKPYCeTbc-4o",
-    "ticker": "FRIO",
-    "decimals": 9,
-    "creator": "ta4xUEvMgPYGUiCrbX0az58_D4-j0lmwZEj_-Yb2-S2MrX",
-    "mint_authority": "ta4xUEvMgPYGUiCrbX0az58_D4-j0lmwZEj_-Yb2-S2MrX",
-    "freeze_authority": "ta4xUEvMgPYGUiCrbX0az58_D4-j0lmwZEj_-Yb2-S2MrX"
-  }
+  "addresses": [
+    { "name": "alice", "address": "taFXv...", "addedAt": "2026-07-09T..." },
+    { "name": "bob", "address": "ta2sY...", "addedAt": "2026-07-09T..." }
+  ],
+  "active": "alice"
 }
 ```
 
-<br>
-
-### 2️⃣ Create Token Account
+## Telegram Bot
 
 ```bash
-SEED=$(python3 -c "import secrets; print(secrets.token_hex(32))")
-
-thru token initialize-account \
-  <MINT_ADDRESS> \
-  <OWNER_ADDRESS> \
-  $SEED \
-  --json
-```
-
-**Response:**
-```json
-{
-  "token_initialize_account": {
-    "status": "success",
-    "token_account": "taQPEDM_d7C-cGQj8Yv6IRVUqmP22tfzUyGTsd_cnCCsMm",
-    "mint": "ta5YmaFApl_3d8d92gVRPVNCZldHxUtgXMTKPYCeTbc-4o",
-    "owner": "ta4xUEvMgPYGUiCrbX0az58_D4-j0lmwZEj_-Yb2-S2MrX"
-  }
-}
-```
-
-<br>
-
-### 3️⃣ Mint Tokens
-
-```bash
-# Mint 1B tokens (1,000,000,000 * 10^9 = 1000000000000000000)
-thru token mint-to \
-  <MINT_ADDRESS> \
-  <TOKEN_ACCOUNT_ADDRESS> \
-  <AUTHORITY_ADDRESS> \
-  1000000000000000000 \
-  --json
-```
-
-<br>
-
-### 4️⃣ Transfer Tokens
-
-```bash
-# First, create token account for recipient
-SEED=$(python3 -c "import secrets; print(secrets.token_hex(32))")
-thru token initialize-account <MINT> <RECIPIENT> $SEED --json
-
-# Then transfer
-thru token transfer \
-  <SOURCE_TOKEN_ACCOUNT> \
-  <DEST_TOKEN_ACCOUNT> \
-  50000000000 \
-  --json
-```
-
-<br>
-
-### 5️⃣ Burn Tokens
-
-```bash
-thru token burn \
-  <TOKEN_ACCOUNT> \
-  <MINT_ADDRESS> \
-  <AUTHORITY_ADDRESS> \
-  100000000000 \
-  --json
-```
-
-<br>
-
-### 6️⃣ Freeze Account
-
-```bash
-thru token freeze-account \
-  <TOKEN_ACCOUNT> \
-  <MINT_ADDRESS> \
-  <FREEZE_AUTHORITY_ADDRESS> \
-  --json
-```
-
-**Verify frozen:**
-```bash
-thru token balance <TOKEN_ACCOUNT> --json
-# "is_frozen": true
-```
-
-<br>
-
-### 7️⃣ Thaw Account
-
-```bash
-thru token thaw-account \
-  <TOKEN_ACCOUNT> \
-  <MINT_ADDRESS> \
-  <FREEZE_AUTHORITY_ADDRESS> \
-  --json
-```
-
-<br>
-
-### 📊 FRIO Token Summary
-
-| Property | Value |
-|----------|-------|
-| **Mint** | `ta5YmaFApl_3d8d92gVRPVNCZldHxUtgXMTKPYCeTbc-4o` |
-| **Ticker** | FRIO |
-| **Decimals** | 9 |
-| **Initial Supply** | 1,000,000,000 FRIO |
-| **Mint Authority** | `ta4xUEvMgPYGUiCrbX0az58_D4-j0lmwZEj_-Yb2-S2MrX` |
-| **Freeze Authority** | `ta4xUEvMgPYGUiCrbX0az58_D4-j0lmwZEj_-Yb2-S2MrX` |
-| **Status** | Live on alphanet |
-
-**Operations Performed:**
-- ✅ Transfer 50 FRIO to faucet address
-- ✅ Burn 150 FRIO
-- ✅ Freeze faucet's token account
-- ❌ Revoke authority — not supported on-chain
-
-<br>
-
----
-
-## 🎨 NFT Program
-
-<br>
-
-### 📊 NFT Accounts
-
-| Account | Purpose |
-|---------|---------|
-| `NftMintAccount` | Mint metadata + supply |
-| `NftAccount` | Individual NFT data |
-
-### 📝 Instructions
-
-| Instruction | Description |
-|-------------|-------------|
-| `initialize_mint` | Create NFT mint |
-| `mint_to` | Mint new NFT |
-| `transfer` | Transfer NFT ownership |
-| `burn` | Burn NFT |
-| `update_metadata` | Update NFT metadata |
-
-<br>
-
----
-
-## 🤖 Building with AI Agents
-
-<br>
-
-### 📦 Install Thru Skills
-
-```bash
-npx skills add Unto-Labs/ai
-```
-
-This installs `thru-best-practices` — recommended for agent-driven development.
-
-<br>
-
-### 🔄 Agent Development Pattern
-
-```
-┌─────────────┐
-│  1. UNDERSTAND │  Read docs, explore chain via MCP
-└──────┬──────┘
-       ▼
-┌─────────────┐
-│  2. PLAN     │  Design program + instructions
-└──────┬──────┘
-       ▼
-┌─────────────┐
-│  3. BUILD    │  Write C code, compile to RISC-V
-└──────┬──────┘
-       ▼
-┌─────────────┐
-│  4. VALIDATE │  Check ABI, test locally
-└──────┬──────┘
-       ▼
-┌─────────────┐
-│  5. DEPLOY   │  Upload to alphanet
-└──────┬──────┘
-       ▼
-┌─────────────┐
-│  6. DEBUG    │  Inspect via Explorer MCP
-└──────┬──────┘
-       ▼
-┌─────────────┐
-│  7. ITERATE  │  Upgrade, re-validate
-└─────────────┘
-```
-
-<br>
-
----
-
-## 🤖 Telegram Bot
-
-Telegram bot untuk interact sama Thru blockchain langsung dari chat.
-
-### Setup
-
-```bash
-# Install dependencies
 pip install python-telegram-bot
-
-# Set bot token (dari @BotFather)
-export THRU_BOT_TOKEN="your-token-here"
-
-# Run bot
-python3 ~/thru-bot/bot.py
+export THRU_BOT_TOKEN="token-from-BotFather"
+python3 thru-bot/bot.py
 ```
 
-### Commands
+Commands: `/balance`, `/send`, `/deploy`, `/programs`, `/status`
 
-| Command | Description |
-|---------|-------------|
-| `/balance [address]` | Check balance |
-| `/send <to> <amount>` | Send tokens |
-| `/deploy <binary> [seed]` | Deploy program |
-| `/programs` | List deployed programs |
-| `/status` | Network status |
-
-### Source
-
-📁 [`thru-bot/bot.py`](thru-bot/bot.py)
-
----
-
-## 🔌 MCP Server
-
-Model Context Protocol server untuk AI agents (Claude Code, Codex, etc).
-
-### Setup
+## MCP Server (AI Agents)
 
 ```bash
 pip install mcp
-
-# Run server
-python3 ~/thru-mcp/server.py
+python3 thru-mcp/server.py
 
 # Add to Claude Code
-claude mcp add --transport stdio thru-explorer python3 ~/thru-mcp/server.py
+claude mcp add --transport stdio thru-mcp python3 ~/thru-mcp/server.py
 ```
 
-### Available Tools
+Tools: `get_balance`, `get_block_height`, `get_health`, `get_transaction`, `derive_address`, `make_state_proof`
 
-| Tool | Description |
-|------|-------------|
-| `get_balance` | Check account balance |
-| `get_block_height` | Get current block height |
-| `get_health` | Network health status |
-| `get_transaction` | Get transaction details |
-| `derive_address` | Derive PDA address |
-| `make_state_proof` | Generate state proof |
-| `list_programs` | List deployed programs |
-| `get_network_info` | Comprehensive network info |
-
-### Source
-
-📁 [`thru-mcp/server.py`](thru-mcp/server.py)
-
----
-
-## 🚰 Faucet & Airdrop Tools
-
-### Faucet Bot
-
-Interactive faucet untuk distribute testnet tokens.
+## Frontend
 
 ```bash
-# Interactive mode
-python3 ~/thru-bot/faucet.py
-
-# CLI mode
-python3 ~/thru-bot/faucet.py <address1> <address2> ...
+cd thru-frontend && python3 -m http.server 8080
+# open http://localhost:8080
 ```
 
-**Features:**
-- Cooldown: 60s between requests
-- Daily limit: 10,000 tokens per address
-- Batch distribute support
+Counter UI with increment/decrement/reset, activity log, dark mode.
 
-### Airdrop Tool
-
-Bulk send tokens ke multiple wallets.
+## Faucet & Airdrop
 
 ```bash
-# From CSV file
-python3 ~/thru-bot/airdrop.py airdrop addresses.csv 100
+# Faucet
+python3 thru-bot/faucet.py                          # interactive
+python3 thru-bot/faucet.py <address1> <address2>    # CLI
 
-# Single send
-python3 ~/thru-bot/airdrop.py send <address> 100
-
-# Interactive mode
-python3 ~/thru-bot/airdrop.py
+# Airdrop
+python3 thru-bot/airdrop.py airdrop addresses.csv 100
+python3 thru-bot/airdrop.py send <address> 100
 ```
 
-**CSV Format:**
-```csv
-ta1abc...,100
-ta2def...,200
-ta3ghi...
-```
+CSV format: `address,amount` per line.
 
-### Source
-
-📁 [`thru-bot/faucet.py`](thru-bot/faucet.py)
-📁 [`thru-bot/airdrop.py`](thru-bot/airdrop.py)
-
----
-
-## 🌐 Counter Frontend
-
-Web UI untuk interact sama counter program on-chain.
-
-### Features
-
-- Counter display with increment/decrement/reset
-- Configuration panel (program + PDA address)
-- Activity log
-- Dark mode design
-
-### Usage
+## Useful Commands
 
 ```bash
-# Open in browser
-open ~/thru-frontend/index.html
+# Status
+thru getversion; thru gethealth; thru getheight
 
-# Or serve locally
-cd ~/thru-frontend && python3 -m http.server 8080
-```
+# Keys & Accounts
+thru keys generate <name>; thru keys list
+thru account create <name>; thru getbalance <addr>
 
-### Source
+# Programs
+thru program create <seed> <binary>
+thru program upgrade <seed> <binary>
+thru program derive-address <prog> <seed>
+thru program seed-to-hex <seed>
 
-📁 [`thru-frontend/index.html`](thru-frontend/index.html)
+# Transactions
+thru txn execute --fee 0 --readwrite-accounts <acct> <program> <hex>
+thru txn make-state-proof creating <addr>
 
----
-
-## 📚 Useful Commands
-
-<br>
-
-### 🔍 Quick Reference
-
-<details>
-<summary><b>🚀 Setup & Status</b></summary>
-
-```bash
-thru --help                  # Show all commands
-thru getversion              # Node version
-thru gethealth               # Health status
-thru getstatus               # Operational status
-thru getheight               # Block heights
-```
-
-</details>
-
-<details>
-<summary><b>🔑 Keys & Accounts</b></summary>
-
-```bash
-thru keys generate <name>    # Generate keypair
-thru keys list               # List keypairs
-thru account create <name>   # Create account
-thru getbalance <address>    # Check balance
-thru getaccountinfo <addr>   # Account details
-thru transfer <to> <amount>  # Transfer tokens
-```
-
-</details>
-
-<details>
-<summary><b>📦 Programs</b></summary>
-
-```bash
-thru program create <seed> <binary>        # Deploy
-thru program upgrade <seed> <binary>       # Upgrade
-thru program set-pause <seed> true         # Pause
-thru program finalize <seed>               # Make immutable
-thru program destroy <seed>                # Destroy
-thru program derive-address <prog> <seed>  # Derive PDA
-thru program seed-to-hex <seed>            # Seed to hex
-```
-
-</details>
-
-<details>
-<summary><b>📋 ABI</b></summary>
-
-```bash
-thru abi analyze <abi.yaml>               # Validate
-thru abi codegen --files <abi.yaml> \     # Generate code
-  --language typescript \
-  --output ./gen/
-thru abi account create <seed> <abi.yaml>  # Publish
-thru abi account get --include-data <addr> # Read
-```
-
-</details>
-
-<details>
-<summary><b>📨 Transactions</b></summary>
-
-```bash
-thru txn execute \                         # Execute
-  --fee 0 \
-  --readwrite-accounts <acct> \
-  <program> \
-  <hex_data>
-
-thru txn make-state-proof creating <addr>  # Generate proof
-```
-
-</details>
-
-<details>
-<summary><b>🪙 Tokens</b></summary>
-
-```bash
-# Initialize mint
+# Tokens
 thru token initialize-mint <creator> <ticker> <seed> --decimals 9
-
-# Initialize token account
 thru token initialize-account <mint> <owner> <seed>
-
-# Mint tokens
 thru token mint-to <mint> <to> <authority> <amount>
-
-# Transfer tokens
 thru token transfer <from> <to> <amount>
-
-# Burn tokens
-thru token burn <account> <mint> <authority> <amount>
-
-# Freeze account
-thru token freeze-account <account> <mint> <authority>
-
-# Thaw account
-thru token thaw-account <account> <mint> <authority>
-
-# Check balance
 thru token balance <account>
-
-# Close account
-thru token close-account <account> <destination> <authority>
 ```
 
-</details>
-
-<details>
-<summary><b>🛠️ Dev Tools</b></summary>
-
-```bash
-thru dev toolchain install  # Install RISC-V toolchain
-thru dev sdk install c      # Install C SDK
-thru network list           # List networks
-thru network use <name>     # Switch network
-thru faucet request <name>  # Get testnet tokens
-```
-
-</details>
-
-<br>
-
----
-
-## 🔗 Resources
-
-<br>
-
-<table>
-<tr>
-<td width="50%">
-
-### 📖 Official
+## Resources
 
 | Resource | Link |
 |----------|------|
@@ -1668,146 +239,14 @@ thru faucet request <name>  # Get testnet tokens
 | AI Skills | [Unto-Labs/ai](https://github.com/Unto-Labs/ai) |
 | LLM Docs | [llms-full.txt](https://docs.thru.org/llms-full.txt) |
 
-</td>
-<td width="50%">
-
-### 🔌 Endpoints
-
-| Service | URL |
-|---------|-----|
+| Endpoint | URL |
+|----------|-----|
 | RPC | `https://rpc.alphanet.thru.org` |
 | gRPC | `https://grpc.alphanet.thru.org` |
 | Explorer MCP | `https://scan.thru.org/api/mcp` |
 
-</td>
-</tr>
-</table>
-
-<br>
-
----
-
-## 🚀 Deployed Programs
-
-<table>
-<tr>
-<td width="50%">
-
-### 🔄 Counter Program v7
-
-| Property | Value |
-|----------|-------|
-| **Program** | `ta2sYKmgW-b0FQEP2-pMYROxnAIMTrZTgpJqgVvxAHe423` |
-| **Meta** | `ta3O9EaMvENH7aYg5HzOgDa0pO_j7mgdwYBXMOifCDKNQY` |
-| **Seed** | `counter-v7` |
-| **Size** | 1148 bytes |
-| **Source** | [`examples/counter/tn_counter_v7.c`](examples/counter/tn_counter_v7.c) |
-
-</td>
-<td width="50%">
-
-### 📋 Operations
-
-| Instruction | Type | Description |
-|-------------|------|-------------|
-| Create | `0` | Init counter to 0 |
-| Increment | `1` | Counter += 1 (emits event) |
-| Decrement | `2` | Counter -= 1 (underflow protected) |
-| Reset | `3` | Counter = 0 (emits event) |
-| Read | `4` | Emit current value (read-only) |
-
-**Quick Test:**
-```bash
-# 1. Derive PDA
-thru program derive-address ta2sYKmgW-b0FQEP2-pMYROxnAIMTrZTgpJqgVvxAHe423 test-counter
-
-# 2. Make state proof
-thru txn make-state-proof creating <PDA>
-
-# 3. Create counter (use python to build instr data)
-
-# 4. Increment
-thru txn execute --fee 0 --readwrite-accounts <PDA> ta2sYKmgW-b0FQEP2-pMYROxnAIMTrZTgpJqgVvxAHe423 010000000200
-
-# 5. Decrement
-thru txn execute --fee 0 --readwrite-accounts <PDA> ta2sYKmgW-b0FQEP2-pMYROxnAIMTrZTgpJqgVvxAHe423 020000000200
-
-# 6. Reset
-thru txn execute --fee 0 --readwrite-accounts <PDA> ta2sYKmgW-b0FQEP2-pMYROxnAIMTrZTgpJqgVvxAHe423 030000000200
-
-# 7. Read
-thru txn execute --fee 0 --readwrite-accounts <PDA> ta2sYKmgW-b0FQEP2-pMYROxnAIMTrZTgpJqgVvxAHe423 040000000200
-```
-
-</td>
-</tr>
-</table>
-> 📁 Source code: [`examples/counter/`](examples/counter/)
-
-<br>
-
-### 🔒 Escrow Program v1
-
-| Property | Value |
-|----------|-------|
-| **Program** | `taYRu8D8yaZksfNK42mTXIpbqVcmgS6Zr0agCeqOpBSOaL` |
-| **Meta** | `tajTHKh2W2uvY1Se79Ju2hCCrv0QIW1lG8n1F8cVqW7Zg2` |
-| **Seed** | `escrow-v1` |
-| **Size** | 1202 bytes |
-| **Source** | [`examples/counter/tn_escrow.c`](examples/counter/tn_escrow.c) |
-
-| Instruction | Type | Description |
-|-------------|------|-------------|
-| Create | `0` | Lock funds (buyer + seller) |
-| Release | `1` | Send to seller |
-| Dispute | `2` | Flag for review |
-| Refund | `3` | Return to buyer |
-| Read | `4` | Get escrow state |
-
-**State Machine:**
-```
-Created → Released
-Created → Disputed → Released
-Created → Disputed → Refunded
-Created → Refunded
-```
-
-<br>
-
-### 🗳️ Voting Program v4
-
-| Property | Value |
-|----------|-------|
-| **Program** | `taH5gAKRdirmY8kImoKAeW4lzk6fZCJbbNm6eLDtYcJxoo` |
-| **Meta** | `taOseKa5mI857F9Tmf52EzqB-3oswq_7G7ASbNrPPv_xjP` |
-| **Seed** | `voting-v4` |
-| **Size** | 1402 bytes |
-| **Source** | [`examples/counter/tn_voting.c`](examples/counter/tn_voting.c) |
-
-| Instruction | Type | Description |
-|-------------|------|-------------|
-| Create Proposal | `0` | Init with N options |
-| Cast Vote | `1` | Vote for option (duplicate protected) |
-| Close Proposal | `2` | Stop accepting votes |
-| Read Results | `3` | Emit vote counts as events |
-
-<br>
-
-### 🪙 FRIO Token
-
-| Property | Value |
-|----------|-------|
-| **Mint** | `ta5YmaFApl_3d8d92gVRPVNCZldHxUtgXMTKPYCeTbc-4o` |
-| **Ticker** | FRIO |
-| **Decimals** | 9 |
-| **Supply** | 1,000,000,000 FRIO |
-| **Creator** | `ta4xUEvMgPYGUiCrbX0az58_D4-j0lmwZEj_-Yb2-S2MrX` |
-
-<br>
-
 ---
 
 <p align="center">
-  <b>Built with ⚡ for the Thru Alphanet</b><br>
-  <sub>Last updated: July 2026</sub>
+  <sub>Built with ⚡ for the Thru Alphanet · July 2026</sub>
 </p>

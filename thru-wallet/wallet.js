@@ -1,12 +1,14 @@
 /**
- * Thru Wallet Adapter
- * 
- * Simple wallet management for Thru Alphanet.
+ * Thru Wallet Adapter v2
+ * Multi-address wallet management for Thru Alphanet.
  */
 
 const { createThruClient, TransactionBuilder, Pubkey, keys, deriveAddress } = require('@thru/sdk');
+const fs = require('fs');
+const path = require('path');
 
 const RPC_URL = 'https://rpc.alphanet.thru.org';
+const KEYSTORE_PATH = path.join(process.env.HOME, '.thru', 'keystore', 'wallet.json');
 
 class ThruWallet {
     constructor(options = {}) {
@@ -14,12 +16,87 @@ class ThruWallet {
         this.client = null;
         this.keypair = null;
         this.address = null;
+        this.addresses = this._loadKeystore();
     }
+
+    // === Keystore ===
+
+    _loadKeystore() {
+        try {
+            if (fs.existsSync(KEYSTORE_PATH)) {
+                return JSON.parse(fs.readFileSync(KEYSTORE_PATH, 'utf-8'));
+            }
+        } catch (e) {}
+        return { addresses: [], active: null };
+    }
+
+    _saveKeystore() {
+        const dir = path.dirname(KEYSTORE_PATH);
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        fs.writeFileSync(KEYSTORE_PATH, JSON.stringify(this.addresses, null, 2));
+    }
+
+    // === Address Management ===
+
+    addAddress(name, address) {
+        const existing = this.addresses.addresses.find(a => a.name === name);
+        if (existing) throw new Error(`Address "${name}" already exists`);
+
+        this.addresses.addresses.push({
+            name,
+            address,
+            addedAt: new Date().toISOString(),
+        });
+
+        if (!this.addresses.active) this.addresses.active = name;
+        this._saveKeystore();
+        return { name, address, total: this.addresses.addresses.length };
+    }
+
+    removeAddress(name) {
+        const idx = this.addresses.addresses.findIndex(a => a.name === name);
+        if (idx === -1) throw new Error(`Address "${name}" not found`);
+
+        this.addresses.addresses.splice(idx, 1);
+        if (this.addresses.active === name) {
+            this.addresses.active = this.addresses.addresses[0]?.name || null;
+        }
+        this._saveKeystore();
+        return { removed: name, total: this.addresses.addresses.length, active: this.addresses.active };
+    }
+
+    switchAddress(name) {
+        const found = this.addresses.addresses.find(a => a.name === name);
+        if (!found) throw new Error(`Address "${name}" not found`);
+
+        this.addresses.active = name;
+        this._saveKeystore();
+        return { active: name, address: found.address };
+    }
+
+    listAddresses() {
+        return {
+            addresses: this.addresses.addresses.map(a => ({
+                ...a,
+                isActive: a.name === this.addresses.active,
+            })),
+            active: this.addresses.active,
+        };
+    }
+
+    getActiveAddress() {
+        if (!this.addresses.active) return null;
+        return this.addresses.addresses.find(a => a.name === this.addresses.active);
+    }
+
+    // === Connection ===
 
     async connect() {
         this.client = createThruClient({ rpcUrl: this.rpcUrl });
         return this;
     }
+
+    // === Keypair ===
 
     async generateKeypair() {
         this.keypair = await keys.generateKeyPair();
@@ -41,10 +118,11 @@ class ThruWallet {
         };
     }
 
+    // === RPC ===
+
     async getBalance(address) {
         if (!this.client) await this.connect();
-        const addr = address || this.address;
-        // Use CLI as fallback
+        const addr = address || this.address || this.getActiveAddress()?.address;
         const { execSync } = require('child_process');
         try {
             const output = execSync(`thru --json account info ${addr}`, { encoding: 'utf-8' });
@@ -61,10 +139,10 @@ class ThruWallet {
     }
 
     async execute(options) {
-        // Use CLI for now (SDK transaction building is complex)
         const { execSync } = require('child_process');
+        const payer = options.feePayer || this.address || this.getActiveAddress()?.address || 'frio';
         
-        let cmd = `thru --json txn execute --fee ${options.fee || 0} --fee-payer ${this.address || 'frio'}`;
+        let cmd = `thru --json txn execute --fee ${options.fee || 0} --fee-payer ${payer}`;
         
         if (options.readwriteAccounts) {
             for (const acct of options.readwriteAccounts) {
