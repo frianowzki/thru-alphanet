@@ -14,13 +14,13 @@
             --bg-card-hover: rgba(255,255,255,0.06);
             --bg-input: rgba(255,255,255,0.04);
             --border: rgba(255,255,255,0.06);
-            --border-focus: rgba(124,92,224,0.5);
+            --border-focus: rgba(229,57,53,0.5);
             --text: #fff;
             --text-dim: #888;
             --text-muted: #555;
-            --accent: #7c5ce0;
-            --accent-light: #9b7ee8;
-            --accent-glow: rgba(124,92,224,0.15);
+            --accent: #E53935;
+            --accent-light: #EF5350;
+            --accent-glow: rgba(229,57,53,0.15);
             --green: #22c55e;
             --red: #ef4444;
             --yellow: #eab308;
@@ -74,10 +74,10 @@
         .btn-primary:hover:not(:disabled) { box-shadow:0 4px 20px var(--accent-glow); }
         .btn-ghost { background:transparent; color:var(--text-dim); border:1px solid var(--border); }
         .btn-ghost:hover { border-color:var(--accent); color:var(--accent-light); }
-        .btn-danger { background:rgba(239,68,68,0.1); color:var(--red); border:1px solid rgba(239,68,68,0.2); }
-        .btn-danger:hover { background:rgba(239,68,68,0.2); }
-        .btn-faucet { background:linear-gradient(135deg,var(--green),#16a34a); color:#fff; width:100%; padding:11px; }
-        .btn-faucet:hover:not(:disabled) { box-shadow:0 4px 16px rgba(34,197,94,0.25); }
+        .btn-danger { background:rgba(255,255,255,0.05); color:var(--text-dim); border:1px solid var(--border); }
+        .btn-danger:hover { background:rgba(255,255,255,0.1); color:var(--text); border-color:rgba(255,255,255,0.15); }
+        .btn-faucet { background:rgba(255,255,255,0.05); color:var(--text-dim); border:1px solid var(--border); width:100%; padding:11px; }
+        .btn-faucet:hover:not(:disabled) { background:rgba(255,255,255,0.1); color:var(--text); border-color:rgba(255,255,255,0.15); }
 
         /* ── Counter Display ── */
         .counter-wrap { text-align:center; padding:32px 20px; background:var(--bg-input); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:18px; }
@@ -189,10 +189,10 @@
         </div>
         <div class="wallet-actions">
             <button class="btn btn-faucet" id="btn-faucet" onclick="requestFaucet()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2c-4 4-6 8-6 12a6 6 0 0 0 12 0c0-4-2-8-6-12z"/></svg> Faucet (10)
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2c-4 4-6 8-6 12a6 6 0 0 0 12 0c0-4-2-8-6-12z"/></svg> Faucet
             </button>
             <button class="btn btn-danger" onclick="disconnectWallet()">
-                Disconnect
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
             </button>
         </div>
     </div>
@@ -275,7 +275,7 @@ async function discoverAPI() {
         if (data.gethealth?.status === 'serving') {
             API_BASE = url;
             setApiStatus('ok', `API online`);
-            log(`API connected: ${new URL(url).hostname.substring(0,30)}...`, 'ok');
+            log('API connected', 'ok');
             return true;
         }
         throw new Error('API not healthy');
