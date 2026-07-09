@@ -180,7 +180,11 @@ Tools: `get_balance`, `get_block_height`, `get_health`, `get_transaction`, `deri
 
 ## Frontend (Real On-Chain)
 
-Web UI with real on-chain execution via backend API.
+**Live:** [thru-counter.vercel.app](https://thru-counter.vercel.app)
+
+Web UI with real on-chain execution. Users enter their own private key + custom program/PDA addresses.
+
+**Security:** Private key is ephemeral — imported → used → deleted per-request. Never stored or logged.
 
 ```bash
 # Start API server (proxies to thru CLI)
