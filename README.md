@@ -56,7 +56,7 @@ Environment variables:
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `PORT` | `3001` | API server port |
-| `THRU_KEY_NAME` | `frio` | Server key name (pays tx fees) |
+| `THRU_KEY_NAME` | `default` | Server key name (pays tx fees) |
 | `THRU_GIST_ID` | (built-in) | Gist ID for API URL discovery |
 
 ### Architecture
@@ -92,20 +92,20 @@ thru keys list
 thru keys generate mykey
 
 # Show public key
-thru keys show frio
+thru keys show default
 ```
 
 ### Account Operations
 
 ```bash
 # Create account from key
-thru account create frio
+thru account create default
 
 # Check balance
-thru account balance frio
+thru account balance default
 
 # Request testnet tokens
-thru faucet withdraw frio 10000
+thru faucet withdraw default 10000
 ```
 
 ### Counter Program
@@ -134,7 +134,7 @@ node thru-wallet/cli.js list
 node thru-wallet/cli.js balance <address>
 
 # Get address from key name
-node thru-wallet/cli.js address frio
+node thru-wallet/cli.js address default
 ```
 
 ### MCP Server (AI Agent Tools)
