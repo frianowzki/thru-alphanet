@@ -130,6 +130,16 @@ class ThruHandler(BaseHTTPRequestHandler):
         if path == "/api/status":
             return self.send_json(thru_cmd(["gethealth"]))
 
+        if path == "/api/counter/value":
+            qs = parse_qs(urlparse(self.path).query)
+            pda = qs.get("pda", [None])[0]
+            if not pda:
+                return self.send_json({"error": "Missing ?pda="}, 400)
+            value = get_counter_value(pda)
+            if value is None:
+                return self.send_json({"error": "Counter not found", "pda": pda}, 404)
+            return self.send_json({"pda": pda, "value": value})
+
         # Serve frontend
         idx = os.path.join(os.path.dirname(os.path.abspath(__file__)),
                            "..", "thru-frontend", "index.html")
