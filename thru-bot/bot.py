@@ -11,7 +11,7 @@ from telegram.ext import Application, CommandHandler, MessageHandler, filters, C
 # Config
 BOT_TOKEN = os.environ.get("THRU_BOT_TOKEN", "")
 RPC_URL = "https://rpc.alphanet.thru.org"
-FEE_PAYER = "frio"  # key name in ~/.thru/cli/config.yaml
+FEE_PAYER = os.environ.get("THRU_KEY_NAME", "default")  # key name in ~/.thru/cli/config.yaml
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -51,7 +51,7 @@ async def cmd_start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def cmd_balance(update: Update, context: ContextTypes.DEFAULT_TYPE):
     """Check account balance."""
     if not context.args:
-        # Default to frio key
+        # Default key name from env or config
         data = thru_cmd(["account", "info", FEE_PAYER])
         if "account_info" in data:
             info = data["account_info"]

@@ -11,7 +11,7 @@ from datetime import datetime
 
 # Config
 DEFAULT_AMOUNT = 100
-FEE_PAYER = "frio"
+FEE_PAYER = os.environ.get("THRU_KEY_NAME", "default")
 RPC_URL = "https://rpc.alphanet.thru.org"
 
 

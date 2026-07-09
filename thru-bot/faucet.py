@@ -11,7 +11,7 @@ import sys
 AMOUNT_PER_REQUEST = 1000  # tokens per request
 MAX_DAILY = 10000  # max tokens per address per day
 COOLDOWN = 60  # seconds between requests from same address
-FEE_PAYER = "frio"
+FEE_PAYER = os.environ.get("THRU_KEY_NAME", "default")
 
 # Track requests
 requests_log = {}

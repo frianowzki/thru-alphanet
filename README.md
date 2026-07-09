@@ -134,7 +134,7 @@ Multi-address wallet adapter for Thru Alphanet.
 cd thru-wallet && npm install
 
 node cli.js generate                        # generate new keypair
-node cli.js add alice taFXv...Hv            # add existing address
+node cli.js add alice <YOUR_ADDRESS>        # add existing address
 node cli.js list                            # list all addresses
 node cli.js switch alice                    # set active address
 node cli.js balance                         # check active balance
@@ -149,7 +149,7 @@ Saved to `~/.thru/keystore/wallet.json`:
 ```json
 {
   "addresses": [
-    { "name": "alice", "address": "taFXv...", "addedAt": "2026-07-09T..." },
+    { "name": "alice", "address": "ta...", "addedAt": "2026-07-09T..." },
     { "name": "bob", "address": "ta2sY...", "addedAt": "2026-07-09T..." }
   ],
   "active": "alice"

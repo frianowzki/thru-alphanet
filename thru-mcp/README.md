@@ -33,5 +33,5 @@ python3 server.py
 ## Usage with Claude Code
 
 ```bash
-claude mcp add --transport stdio thru-explorer python3 /home/frio/thru-mcp/server.py
+claude mcp add --transport stdio thru-mcp python3 ~/thru-mcp/server.py
 ```
