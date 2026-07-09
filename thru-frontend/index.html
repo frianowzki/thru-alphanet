@@ -4,118 +4,242 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Thru Counter — On-Chain</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        *{margin:0;padding:0;box-sizing:border-box}
-        body{font-family:'Inter',system-ui,sans-serif;background:#0a0a0f;color:#fff;min-height:100vh}
-        .c{max-width:640px;margin:0 auto;padding:40px 20px}
-        h1{font-size:2rem;text-align:center;margin-bottom:8px}
-        .sub{text-align:center;color:#888;margin-bottom:32px;font-size:.95rem}
-        .card{background:#1a1a2e;border-radius:16px;padding:24px;margin-bottom:16px;border:1px solid #2a2a3e}
-        .card h2{font-size:1.1rem;margin-bottom:14px;color:#00d4ff;display:flex;align-items:center;gap:8px}
-        .counter-display{font-size:4rem;text-align:center;padding:20px;background:#0d0d1a;border-radius:12px;margin-bottom:20px;font-weight:700;font-variant-numeric:tabular-nums}
-        .btns{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-        .btn{padding:14px;border:none;border-radius:10px;font-size:1rem;font-weight:600;cursor:pointer;transition:all .15s}
-        .btn:hover{transform:translateY(-2px)}.btn:active{transform:none}.btn:disabled{opacity:.4;cursor:not-allowed;transform:none}
-        .btn-i{background:#00d4ff;color:#000}.btn-d{background:#ff6b6b;color:#fff}
-        .btn-r{background:#6c5ce7;color:#fff}.btn-ro{background:#00b894;color:#fff;grid-column:span 3}
-        .btn-connect{background:linear-gradient(135deg,#00d4ff,#6c5ce7);color:#fff;width:100%;padding:14px}
-        .btn-faucet{background:linear-gradient(135deg,#00b894,#00cec9);color:#fff;width:100%;padding:10px;margin-top:10px;border:none;border-radius:8px;font-size:.9rem;font-weight:600;cursor:pointer;transition:all .15s}
-        .btn-faucet:hover{transform:translateY(-1px);opacity:.9}.btn-faucet:active{transform:none}
-        .ig{margin-bottom:14px}.ig label{display:block;margin-bottom:6px;color:#888;font-size:.85rem}
-        .ig input{width:100%;padding:11px;background:#0d0d1a;border:1px solid #2a2a3e;border-radius:8px;color:#fff;font-size:.95rem;font-family:monospace}
-        .ig input:focus{outline:none;border-color:#00d4ff}
-        .wi{display:flex;justify-content:space-between;align-items:center;padding:12px;background:#0d0d1a;border-radius:8px;margin-bottom:12px}
-        .wa{font-family:monospace;font-size:.82rem;color:#00d4ff;word-break:break-all}
-        .wb{font-size:1.1rem;font-weight:700}
-        .badge{display:inline-block;padding:3px 8px;border-radius:6px;font-size:.72rem;font-weight:600}
-        .b-ok{background:#00b89420;color:#00b894;border:1px solid #00b89440}
-        .log{padding:12px;background:#0d0d1a;border-radius:8px;margin-top:14px;font-family:monospace;font-size:.82rem;color:#888;max-height:180px;overflow-y:auto}
-        .log .ok{color:#00b894}.log .er{color:#ff6b6b}.log .inf{color:#00d4ff}.log .tx{color:#fdcb6e}
-        .ld{display:inline-block;width:14px;height:14px;border:2px solid #333;border-top-color:#00d4ff;border-radius:50%;animation:sp .7s linear infinite}
-        @keyframes sp{to{transform:rotate(360deg)}}
-        .ft{text-align:center;margin-top:32px;color:#555;font-size:.82rem}
-        a{color:#00d4ff;text-decoration:none}.hid{display:none}
-        .sec{margin-top:12px;padding:12px;background:#0d0d1a;border-radius:8px;border:1px dashed #2a2a3e}
-        .sec p{font-size:.8rem;color:#666;margin-bottom:6px}
-        .row{display:flex;gap:8px}.row .ig{flex:1}
-        .status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px}
-        .dot-green{background:#00b894}.dot-red{background:#ff6b6b}.dot-yellow{background:#fdcb6e}
+        :root {
+            --bg: #0a0a0f;
+            --bg-card: rgba(255,255,255,0.03);
+            --bg-card-hover: rgba(255,255,255,0.06);
+            --bg-input: rgba(255,255,255,0.04);
+            --border: rgba(255,255,255,0.06);
+            --border-focus: rgba(124,92,224,0.5);
+            --text: #fff;
+            --text-dim: #888;
+            --text-muted: #555;
+            --accent: #7c5ce0;
+            --accent-light: #9b7ee8;
+            --accent-glow: rgba(124,92,224,0.15);
+            --green: #22c55e;
+            --red: #ef4444;
+            --yellow: #eab308;
+            --font: 'Inter', -apple-system, sans-serif;
+            --font-display: 'Space Grotesk', 'Inter', sans-serif;
+            --radius: 14px;
+            --radius-sm: 10px;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body { font-family:var(--font); background:var(--bg); color:var(--text); min-height:100vh; -webkit-font-smoothing:antialiased; }
+
+        /* ── Layout ── */
+        .container { max-width:680px; margin:0 auto; padding:48px 20px; }
+        .header { text-align:center; margin-bottom:40px; }
+        .logo { font-family:var(--font-display); font-size:2.2rem; font-weight:700; letter-spacing:-0.03em; }
+        .logo span { color:var(--accent); }
+        .tagline { color:var(--text-dim); font-size:.9rem; margin-top:6px; }
+
+        /* ── Status Bar ── */
+        .status-bar { display:flex; align-items:center; justify-content:center; gap:8px; margin-top:16px; padding:8px 16px; background:var(--bg-card); border:1px solid var(--border); border-radius:20px; font-size:.78rem; color:var(--text-dim); width:fit-content; margin-left:auto; margin-right:auto; backdrop-filter:blur(12px); }
+        .status-dot { width:7px; height:7px; border-radius:50%; flex-shrink:0; }
+        .dot-green { background:var(--green); box-shadow:0 0 8px rgba(34,197,94,0.4); }
+        .dot-red { background:var(--red); box-shadow:0 0 8px rgba(239,68,68,0.4); }
+        .dot-yellow { background:var(--yellow); box-shadow:0 0 8px rgba(234,179,8,0.4); }
+
+        /* ── Cards ── */
+        .card { background:var(--bg-card); backdrop-filter:blur(20px); border:1px solid var(--border); border-radius:var(--radius); padding:24px; margin-bottom:16px; transition:border-color .2s; }
+        .card:hover { border-color:rgba(255,255,255,0.1); }
+        .card-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:18px; }
+        .card-title { font-family:var(--font-display); font-size:1rem; font-weight:600; display:flex; align-items:center; gap:8px; }
+        .card-badge { font-size:.7rem; padding:3px 10px; border-radius:20px; font-weight:500; }
+        .badge-green { background:rgba(34,197,94,0.12); color:var(--green); border:1px solid rgba(34,197,94,0.2); }
+        .badge-purple { background:var(--accent-glow); color:var(--accent-light); border:1px solid rgba(124,92,224,0.2); }
+        .badge-red { background:rgba(239,68,68,0.12); color:var(--red); border:1px solid rgba(239,68,68,0.2); }
+
+        /* ── Inputs ── */
+        .field { margin-bottom:14px; }
+        .field label { display:block; font-size:.78rem; color:var(--text-dim); margin-bottom:6px; font-weight:500; }
+        .field input { width:100%; padding:11px 14px; background:var(--bg-input); border:1px solid var(--border); border-radius:var(--radius-sm); color:var(--text); font-size:.88rem; font-family:'JetBrains Mono',monospace; transition:border-color .2s; }
+        .field input:focus { outline:none; border-color:var(--border-focus); box-shadow:0 0 0 3px var(--accent-glow); }
+        .field input::placeholder { color:var(--text-muted); }
+        .field-row { display:flex; gap:12px; }
+        .field-row .field { flex:1; }
+
+        /* ── Buttons ── */
+        .btn { padding:12px 20px; border:none; border-radius:var(--radius-sm); font-size:.88rem; font-weight:600; font-family:var(--font); cursor:pointer; transition:all .2s; display:inline-flex; align-items:center; justify-content:center; gap:8px; }
+        .btn:hover { transform:translateY(-1px); }
+        .btn:active { transform:translateY(0); }
+        .btn:disabled { opacity:.35; cursor:not-allowed; transform:none; }
+        .btn-primary { background:linear-gradient(135deg,var(--accent),var(--accent-light)); color:#fff; width:100%; padding:13px; }
+        .btn-primary:hover:not(:disabled) { box-shadow:0 4px 20px var(--accent-glow); }
+        .btn-ghost { background:transparent; color:var(--text-dim); border:1px solid var(--border); }
+        .btn-ghost:hover { border-color:var(--accent); color:var(--accent-light); }
+        .btn-danger { background:rgba(239,68,68,0.1); color:var(--red); border:1px solid rgba(239,68,68,0.2); }
+        .btn-danger:hover { background:rgba(239,68,68,0.2); }
+        .btn-faucet { background:linear-gradient(135deg,var(--green),#16a34a); color:#fff; width:100%; padding:11px; }
+        .btn-faucet:hover:not(:disabled) { box-shadow:0 4px 16px rgba(34,197,94,0.25); }
+
+        /* ── Counter Display ── */
+        .counter-wrap { text-align:center; padding:32px 20px; background:var(--bg-input); border:1px solid var(--border); border-radius:var(--radius); margin-bottom:18px; }
+        .counter-value { font-family:var(--font-display); font-size:4.5rem; font-weight:700; font-variant-numeric:tabular-nums; line-height:1; }
+        .counter-label { font-size:.75rem; color:var(--text-muted); margin-top:8px; text-transform:uppercase; letter-spacing:0.1em; }
+        .counter-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:10px; }
+        .btn-inc { background:rgba(34,197,94,0.12); color:var(--green); border:1px solid rgba(34,197,94,0.2); }
+        .btn-inc:hover:not(:disabled) { background:rgba(34,197,94,0.2); }
+        .btn-dec { background:rgba(239,68,68,0.12); color:var(--red); border:1px solid rgba(239,68,68,0.2); }
+        .btn-dec:hover:not(:disabled) { background:rgba(239,68,68,0.2); }
+        .btn-reset { background:rgba(234,179,8,0.12); color:var(--yellow); border:1px solid rgba(234,179,8,0.2); }
+        .btn-reset:hover:not(:disabled) { background:rgba(234,179,8,0.2); }
+        .btn-read { background:rgba(124,92,224,0.12); color:var(--accent-light); border:1px solid rgba(124,92,224,0.2); grid-column:span 3; }
+        .btn-read:hover:not(:disabled) { background:rgba(124,92,224,0.2); }
+
+        /* ── Wallet Card ── */
+        .wallet-row { display:flex; justify-content:space-between; align-items:center; padding:14px 16px; background:var(--bg-input); border:1px solid var(--border); border-radius:var(--radius-sm); margin-bottom:14px; }
+        .wallet-addr { font-family:monospace; font-size:.78rem; color:var(--accent-light); word-break:break-all; max-width:70%; }
+        .wallet-bal { font-family:var(--font-display); font-size:1.5rem; font-weight:700; text-align:right; }
+        .wallet-bal small { font-size:.7rem; color:var(--text-dim); font-weight:400; display:block; }
+        .wallet-actions { display:flex; gap:10px; }
+        .wallet-actions .btn { flex:1; }
+
+        /* ── Security ── */
+        .security-grid { display:grid; gap:8px; margin-top:12px; }
+        .sec-item { display:flex; align-items:center; gap:10px; padding:10px 14px; background:var(--bg-input); border-radius:var(--radius-sm); font-size:.8rem; color:var(--text-dim); }
+        .sec-icon { width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.7rem; flex-shrink:0; }
+        .sec-green { background:rgba(34,197,94,0.15); color:var(--green); }
+        .sec-purple { background:var(--accent-glow); color:var(--accent-light); }
+
+        /* ── Log ── */
+        .log { padding:14px; background:var(--bg-input); border:1px solid var(--border); border-radius:var(--radius-sm); font-family:'JetBrains Mono',monospace; font-size:.78rem; color:var(--text-muted); max-height:200px; overflow-y:auto; line-height:1.7; }
+        .log::-webkit-scrollbar { width:4px; }
+        .log::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.1); border-radius:4px; }
+        .log .ok { color:var(--green); }
+        .log .er { color:var(--red); }
+        .log .inf { color:var(--accent-light); }
+        .log .tx { color:var(--yellow); }
+
+        /* ── Loading ── */
+        .spinner { display:inline-block; width:14px; height:14px; border:2px solid rgba(255,255,255,0.15); border-top-color:var(--accent-light); border-radius:50%; animation:spin .7s linear infinite; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+
+        /* ── Footer ── */
+        .footer { text-align:center; margin-top:40px; padding-top:20px; border-top:1px solid var(--border); font-size:.78rem; color:var(--text-muted); }
+        .footer a { color:var(--accent-light); text-decoration:none; }
+        .footer a:hover { text-decoration:underline; }
+
+        /* ── Hidden ── */
+        .hid { display:none !important; }
+
+        /* ── Responsive ── */
+        @media (max-width:480px) {
+            .container { padding:24px 14px; }
+            .counter-value { font-size:3.2rem; }
+            .wallet-row { flex-direction:column; gap:12px; align-items:flex-start; }
+            .wallet-bal { text-align:left; }
+            .field-row { flex-direction:column; gap:0; }
+        }
     </style>
 </head>
 <body>
-<div class="c">
-    <h1>🕊️ Thru Counter</h1>
-    <p class="sub">Real on-chain · Your keys, your data</p>
+<div class="container">
+
+    <!-- Header -->
+    <div class="header">
+        <div class="logo">Thru <span>Counter</span></div>
+        <p class="tagline">Real on-chain operations · Your keys, your data</p>
+        <div class="status-bar">
+            <span class="status-dot dot-yellow" id="api-dot"></span>
+            <span id="api-status">Connecting to API...</span>
+        </div>
+    </div>
 
     <!-- Setup Card -->
-    <div class="card">
-        <h2>⚙️ Setup</h2>
-        <div class="ig">
-            <label>Private Key (hex) — never stored, used ephemerally only</label>
+    <div class="card" id="setup-card">
+        <div class="card-header">
+            <div class="card-title">⚙️ Setup</div>
+        </div>
+        <div class="field">
+            <label>Private Key (hex) — used ephemerally, never stored</label>
             <input type="password" id="privkey" placeholder="paste your private key hex...">
         </div>
-        <div class="row">
-            <div class="ig">
+        <div class="field-row">
+            <div class="field">
                 <label>Program Address</label>
                 <input type="text" id="program" value="ta2sYKmgW-b0FQEP2-pMYROxnAIMTrZTgpJqgVvxAHe423">
             </div>
-            <div class="ig">
+            <div class="field">
                 <label>PDA Address (Counter)</label>
                 <input type="text" id="pda" value="tazoq1-tfh31JRP8_oobSNku4zS6p3B_3c1Yw82g9ajUDF">
             </div>
         </div>
-        <div style="margin-bottom:12px">
-            <span class="status-dot dot-yellow" id="api-dot"></span>
-            <span style="font-size:.8rem;color:#888" id="api-status">Connecting to API...</span>
-        </div>
-        <button class="btn btn-connect" onclick="connectWallet()">Connect & Load</button>
+        <button class="btn btn-primary" id="btn-connect" onclick="connectWallet()">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12V7H5a2 2 0 1 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg>
+            Connect Wallet
+        </button>
     </div>
 
-    <!-- Wallet Card -->
+    <!-- Wallet Card (hidden until connected) -->
     <div class="card hid" id="wallet-card">
-        <h2>🔐 Wallet</h2>
-        <div class="wi">
-            <div>
-                <div class="wa" id="wallet-addr">—</div>
-                <span class="badge b-ok">Connected ⛓ on-chain</span>
-            </div>
-            <div class="wb" id="wallet-bal">—</div>
+        <div class="card-header">
+            <div class="card-title">🔐 Wallet</div>
+            <span class="card-badge badge-green" id="wallet-badge">Connected</span>
         </div>
-        <button class="btn btn-faucet" id="btn-faucet" onclick="requestFaucet()">🚰 Request 10 Tokens</button>
+        <div class="wallet-row">
+            <div class="wallet-addr" id="wallet-addr">—</div>
+            <div class="wallet-bal"><span id="wallet-bal">0</span><small>THRU</small></div>
+        </div>
+        <div class="wallet-actions">
+            <button class="btn btn-faucet" id="btn-faucet" onclick="requestFaucet()">
+                🚰 Faucet (10)
+            </button>
+            <button class="btn btn-danger" onclick="disconnectWallet()">
+                Disconnect
+            </button>
+        </div>
     </div>
 
     <!-- Counter Card -->
-    <div class="card">
-        <h2>🔢 Counter</h2>
-        <div class="counter-display" id="counter">—</div>
-        <div class="btns">
-            <button class="btn btn-d" id="btn-d" onclick="exec('decrement')" disabled>−1</button>
-            <button class="btn btn-r" id="btn-r" onclick="exec('reset')" disabled>Reset</button>
-            <button class="btn btn-i" id="btn-i" onclick="exec('increment')" disabled>+1</button>
-            <button class="btn btn-ro" id="btn-ro" onclick="readVal()" disabled>Read from Chain</button>
+    <div class="card" id="counter-card">
+        <div class="card-header">
+            <div class="card-title">🔢 Counter</div>
+            <span class="card-badge badge-purple" id="counter-badge">on-chain</span>
+        </div>
+        <div class="counter-wrap">
+            <div class="counter-value" id="counter">—</div>
+            <div class="counter-label">Current Value</div>
+        </div>
+        <div class="counter-grid">
+            <button class="btn btn-dec" id="btn-d" onclick="exec('decrement')" disabled>−1</button>
+            <button class="btn btn-reset" id="btn-r" onclick="exec('reset')" disabled>Reset</button>
+            <button class="btn btn-inc" id="btn-i" onclick="exec('increment')" disabled>+1</button>
+            <button class="btn btn-read" id="btn-ro" onclick="readVal()" disabled>↻ Read from Chain</button>
         </div>
     </div>
 
     <!-- Security -->
     <div class="card">
-        <h2>🔒 Security</h2>
-        <div class="sec">
-            <p>✓ Private key <b>never stored</b> on server</p>
-            <p>✓ Key is ephemeral — imported → used → deleted per-request</p>
-            <p>✓ All communication encrypted (HTTPS/TLS)</p>
-            <p>✓ Server owner <b>cannot access</b> your key</p>
+        <div class="card-header">
+            <div class="card-title">🔒 Security</div>
+        </div>
+        <div class="security-grid">
+            <div class="sec-item"><div class="sec-icon sec-green">✓</div>Private key <b style="color:#fff;margin-left:4px">never stored</b> on server</div>
+            <div class="sec-item"><div class="sec-icon sec-green">✓</div>Ephemeral — imported → used → deleted per-request</div>
+            <div class="sec-item"><div class="sec-icon sec-green">✓</div>All communication encrypted (HTTPS/TLS)</div>
+            <div class="sec-item"><div class="sec-icon sec-purple">◈</div>Server owner <b style="color:#fff;margin-left:4px">cannot access</b> your key</div>
         </div>
     </div>
 
     <!-- Log -->
     <div class="card">
-        <h2>📋 Activity Log</h2>
+        <div class="card-header">
+            <div class="card-title">📋 Activity Log</div>
+            <button class="btn btn-ghost" style="padding:6px 12px;font-size:.75rem" onclick="document.getElementById('log').innerHTML=''">Clear</button>
+        </div>
         <div class="log" id="log"><div class="inf">Initializing...</div></div>
     </div>
 
-    <div class="ft">
-        Built on <a href="https://thru.org">Thru Alphanet</a> ·
-        <a href="https://github.com/frianowzki/thru-alphanet">GitHub</a>
+    <div class="footer">
+        Built on <a href="https://thru.org" target="_blank">Thru Alphanet</a> · 
+        <a href="https://github.com/frianowzki/thru-alphanet" target="_blank">GitHub</a>
     </div>
 </div>
 
@@ -134,13 +258,11 @@ function log(m, t='inf') {
 }
 
 function setApiStatus(state, text) {
-    const dot = document.getElementById('api-dot');
-    const lbl = document.getElementById('api-status');
-    dot.className = 'status-dot ' + ({ok:'dot-green', err:'dot-red', wait:'dot-yellow'}[state]||'dot-yellow');
-    lbl.textContent = text;
+    document.getElementById('api-dot').className = 'status-dot ' + ({ok:'dot-green', err:'dot-red', wait:'dot-yellow'}[state]||'dot-yellow');
+    document.getElementById('api-status').textContent = text;
 }
 
-// ── Auto-discover API endpoint from Gist ──
+// ── Auto-discover API ──
 async function discoverAPI() {
     log('Discovering API endpoint...');
     try {
@@ -148,19 +270,17 @@ async function discoverAPI() {
         if (!res.ok) throw new Error('Gist fetch failed');
         const url = (await res.text()).trim();
         if (!url.startsWith('https://')) throw new Error('Invalid URL');
-
-        // Verify API is reachable
         const check = await fetch(url + '/api/status', { signal: AbortSignal.timeout(5000) });
         const data = await check.json();
         if (data.gethealth?.status === 'serving') {
             API_BASE = url;
-            setApiStatus('ok', `API connected (${new URL(url).hostname.substring(0,20)}…)`);
-            log(`API discovered: ${url.substring(0, 40)}…`, 'ok');
+            setApiStatus('ok', `API online`);
+            log(`API connected: ${new URL(url).hostname.substring(0,30)}...`, 'ok');
             return true;
         }
         throw new Error('API not healthy');
     } catch (e) {
-        setApiStatus('err', 'API offline — try again later');
+        setApiStatus('err', 'API offline');
         log(`Discovery failed: ${e.message}`, 'er');
         return false;
     }
@@ -186,7 +306,11 @@ async function connectWallet() {
     if (!program || !pda) { log('Fill program + PDA addresses', 'er'); return; }
     if (!API_BASE) { log('API not connected. Wait or refresh.', 'er'); return; }
 
-    log('Connecting...');
+    const btn = document.getElementById('btn-connect');
+    btn.innerHTML = '<span class="spinner"></span> Connecting...';
+    btn.disabled = true;
+
+    log('Connecting to wallet...');
     try {
         const data = await api('/api/wallet/balance', {
             method: 'POST',
@@ -199,13 +323,27 @@ async function connectWallet() {
         document.getElementById('wallet-bal').textContent = data.balance.toLocaleString();
         connected = true;
 
-        document.querySelectorAll('.btns .btn').forEach(b => b.disabled = false);
-        log(`Connected: ${data.address.substring(0, 28)}…`, 'ok');
-        log(`Balance: ${data.balance} tokens`, 'inf');
+        document.querySelectorAll('.counter-grid .btn').forEach(b => b.disabled = false);
+        log(`Wallet: ${data.address.substring(0, 20)}...`, 'ok');
+        log(`Balance: ${data.balance} THRU`, 'inf');
         await readVal();
     } catch (e) {
         log(`Error: ${e.message}`, 'er');
+    } finally {
+        btn.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 12V7H5a2 2 0 1 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/></svg> Connect Wallet';
+        btn.disabled = false;
     }
+}
+
+function disconnectWallet() {
+    connected = false;
+    document.getElementById('wallet-card').classList.add('hid');
+    document.getElementById('privkey').value = '';
+    document.querySelectorAll('.counter-grid .btn').forEach(b => b.disabled = true);
+    document.getElementById('counter').textContent = '—';
+    document.getElementById('wallet-addr').textContent = '—';
+    document.getElementById('wallet-bal').textContent = '0';
+    log('Wallet disconnected', 'tx');
 }
 
 async function requestFaucet() {
@@ -214,8 +352,8 @@ async function requestFaucet() {
     if (!API_BASE) { log('API not connected', 'er'); return; }
 
     const btn = document.getElementById('btn-faucet');
-    const orig = btn.textContent;
-    btn.innerHTML = '<span class="ld"></span>';
+    const orig = btn.innerHTML;
+    btn.innerHTML = '<span class="spinner"></span>';
     btn.disabled = true;
 
     log('Requesting faucet tokens...');
@@ -227,11 +365,11 @@ async function requestFaucet() {
         if (data.error) throw new Error(data.error);
 
         document.getElementById('wallet-bal').textContent = data.balance.toLocaleString();
-        log(`Faucet: +${data.amount} tokens (balance: ${data.balance})`, 'ok');
+        log(`Faucet: +${data.amount} THRU (balance: ${data.balance})`, 'ok');
     } catch (e) {
         log(`Faucet error: ${e.message}`, 'er');
     } finally {
-        btn.textContent = orig;
+        btn.innerHTML = orig;
         btn.disabled = false;
     }
 }
@@ -257,41 +395,35 @@ async function exec(action) {
     const program = document.getElementById('program').value.trim();
     const btnMap = { increment: 'btn-i', decrement: 'btn-d', reset: 'btn-r' };
     const btn = document.getElementById(btnMap[action]);
-    const orig = btn?.textContent;
-    if (btn) btn.innerHTML = '<span class="ld"></span>';
-    document.querySelectorAll('.btns .btn').forEach(b => b.disabled = true);
+    const orig = btn?.innerHTML;
+    if (btn) btn.innerHTML = '<span class="spinner"></span>';
+    document.querySelectorAll('.counter-grid .btn').forEach(b => b.disabled = true);
 
     log(`Executing ${action}...`);
     try {
         const data = await api('/api/counter/execute', {
             method: 'POST',
-            body: { privateKey: pk, pda, program, action },
+            body: { privateKey: pk, pda, action, program },
         });
-        if (data.error && !data.success) throw new Error(data.error);
+        if (data.error) throw new Error(data.error);
 
-        if (data.success) {
+        if (data.value !== null && data.value !== undefined) {
             document.getElementById('counter').textContent = data.value;
-            log(`${action} → ${data.value}`, 'ok');
-            log(`TX: ${data.signature?.substring(0, 36)}…`, 'tx');
-            log(`CU: ${data.compute_units}`, 'inf');
-            const bal = await api('/api/wallet/balance', { method: 'POST', body: { privateKey: pk } });
-            if (bal.balance !== undefined) document.getElementById('wallet-bal').textContent = bal.balance.toLocaleString();
-        } else {
-            log(`Failed: ${data.error || 'unknown'}`, 'er');
         }
+        const emoji = data.success ? '✅' : '❌';
+        log(`${emoji} ${action}: value=${data.value} | sig=${(data.signature||'').substring(0,20)}...`, data.success ? 'ok' : 'er');
     } catch (e) {
         log(`Error: ${e.message}`, 'er');
     } finally {
-        if (btn) btn.textContent = orig;
-        document.querySelectorAll('.btns .btn').forEach(b => b.disabled = false);
+        if (btn) btn.innerHTML = orig;
+        document.querySelectorAll('.counter-grid .btn').forEach(b => b.disabled = false);
     }
 }
 
 // ── Init ──
 (async () => {
-    log('Thru Counter v7 — Real on-chain');
-    const ok = await discoverAPI();
-    if (ok) log('Ready. Enter your private key and connect.');
+    await discoverAPI();
+    log('Ready. Enter your private key and connect.');
 })();
 </script>
 </body>
