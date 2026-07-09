@@ -33,7 +33,7 @@
         body { font-family:var(--font); background:var(--bg); color:var(--text); min-height:100vh; -webkit-font-smoothing:antialiased; }
 
         /* ── Layout ── */
-        .container { max-width:680px; margin:0 auto; padding:48px 20px; }
+        .container { max-width:680px; margin:0 auto; padding:48px 20px; position:relative; z-index:1; }
         .header { text-align:center; margin-bottom:40px; }
         .logo { font-family:var(--font-display); font-size:2.2rem; font-weight:700; letter-spacing:-0.03em; }
         .logo span { color:var(--accent); }
@@ -129,6 +129,18 @@
         /* ── Hidden ── */
         .hid { display:none !important; }
 
+        /* ── Gradient Background ── */
+        .gradient-bg { position:fixed; inset:0; z-index:0; overflow:hidden; pointer-events:none; }
+        .gradient-bg .blob { position:absolute; border-radius:50%; filter:blur(80px); opacity:.15; will-change:transform; }
+        .blob-1 { width:500px; height:500px; background:radial-gradient(circle,var(--accent) 0%,transparent 70%); top:-10%; left:-10%; animation:float1 20s ease-in-out infinite; }
+        .blob-2 { width:400px; height:400px; background:radial-gradient(circle,#1e3a5f 0%,transparent 70%); top:50%; right:-10%; animation:float2 25s ease-in-out infinite; }
+        .blob-3 { width:350px; height:350px; background:radial-gradient(circle,#5f1e3a 0%,transparent 70%); bottom:-10%; left:30%; animation:float3 22s ease-in-out infinite; }
+        @keyframes float1 { 0%,100%{transform:translate(0,0)} 33%{transform:translate(80px,60px)} 66%{transform:translate(-40px,100px)} }
+        @keyframes float2 { 0%,100%{transform:translate(0,0)} 33%{transform:translate(-60px,-80px)} 66%{transform:translate(40px,-40px)} }
+        @keyframes float3 { 0%,100%{transform:translate(0,0)} 33%{transform:translate(60px,-60px)} 66%{transform:translate(-80px,40px)} }
+        @media (prefers-reduced-motion:reduce) { .blob{animation:none!important} }
+        @media (max-width:480px) { .blob-1{width:300px;height:300px} .blob-2{width:250px;height:250px} .blob-3{width:200px;height:200px} }
+
         /* ── Responsive ── */
         @media (max-width:480px) {
             .container { padding:24px 14px; }
@@ -140,6 +152,11 @@
     </style>
 </head>
 <body>
+<div class="gradient-bg">
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+    <div class="blob blob-3"></div>
+</div>
 <div class="container">
 
     <!-- Header -->
