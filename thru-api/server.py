@@ -62,8 +62,7 @@ def thru_cmd(args, timeout=30):
 
 
 def ephemeral_key_import(private_key_hex):
-    """Import a private key as a temp key, return (key_name, address).
-       The key is stored in thru config but should be cleaned up after use."""
+    """Import a private key as a temp key, return (key_name, address)."""
     name = f"_tmp_{secrets.token_hex(4)}"
     r = subprocess.run(
         ["thru", "keys", "add", name, private_key_hex],
@@ -71,7 +70,6 @@ def ephemeral_key_import(private_key_hex):
     )
     if r.returncode != 0:
         return None, None, f"Add failed: {r.stderr.strip()}"
-    # Get address from account info
     data = thru_cmd(["account", "info", name])
     acct = data.get("account_info", {})
     return name, acct.get("pubkey", ""), None
@@ -149,21 +147,19 @@ class ThruHandler(BaseHTTPRequestHandler):
         path = urlparse(self.path).path
         body = self.read_body()
         key_name = None
+        FEE_PAYER = "frio"  # Server key pays all fees — users don't need balance
 
         try:
-            # ── Extract + import ephemeral key ──
-            pk = body.get("privateKey", "").strip()
-            if not pk:
-                return self.send_json({"error": "privateKey required"}, 400)
-
-            key_name, address, err = ephemeral_key_import(pk)
-            if err:
-                return self.send_json({"error": f"Key import failed: {err}"}, 400)
-
             program = body.get("program", DEFAULT_PROGRAM)
 
-            # ── Wallet Balance ──
+            # ── Wallet Balance (needs user's key) ──
             if path == "/api/wallet/balance":
+                pk = body.get("privateKey", "").strip()
+                if not pk:
+                    return self.send_json({"error": "privateKey required"}, 400)
+                key_name, address, err = ephemeral_key_import(pk)
+                if err:
+                    return self.send_json({"error": f"Key import failed: {err}"}, 400)
                 data = thru_cmd(["account", "info", key_name])
                 acct = data.get("account_info", {})
                 return self.send_json({
@@ -172,7 +168,7 @@ class ThruHandler(BaseHTTPRequestHandler):
                     "nonce": acct.get("nonce", 0),
                 })
 
-            # ── Counter Value (read-only, no TX) ──
+            # ── Counter Value (read-only, no TX needed) ──
             if path == "/api/counter/value":
                 pda = body.get("pda") or parse_qs(urlparse(self.path).query).get("pda", [None])[0]
                 if not pda:
@@ -182,7 +178,7 @@ class ThruHandler(BaseHTTPRequestHandler):
                     return self.send_json({"error": "Counter not found", "pda": pda}, 404)
                 return self.send_json({"pda": pda, "value": value})
 
-            # ── Counter Execute ──
+            # ── Counter Execute (frio pays fees) ──
             if path == "/api/counter/execute":
                 pda = body.get("pda")
                 action = body.get("action")
@@ -192,12 +188,11 @@ class ThruHandler(BaseHTTPRequestHandler):
 
                 result = thru_cmd([
                     "txn", "execute", "--fee", "0",
-                    "--fee-payer", key_name,
+                    "--fee-payer", FEE_PAYER,
                     "--readwrite-accounts", pda,
                     program, INSTR_HEX[action],
                 ])
 
-                # Check for CLI-level errors (e.g. account_not_found)
                 cli_err = result.get("error")
                 if cli_err:
                     err_msg = cli_err.get("message", str(cli_err)) if isinstance(cli_err, dict) else str(cli_err)
@@ -219,7 +214,7 @@ class ThruHandler(BaseHTTPRequestHandler):
                     "error": tx.get("vm_error_name") if not ok else None,
                 })
 
-            # ── Counter Create ──
+            # ── Counter Create (frio pays fees) ──
             if path == "/api/counter/create":
                 seed = body.get("seed", "my-counter")
                 pda = derive_pda(program, seed)
@@ -238,7 +233,7 @@ class ThruHandler(BaseHTTPRequestHandler):
                 instr_hex = build_create_instr(seed, proof_hex)
                 result = thru_cmd([
                     "txn", "execute", "--fee", "0",
-                    "--fee-payer", key_name,
+                    "--fee-payer", FEE_PAYER,
                     "--readwrite-accounts", pda,
                     program, instr_hex,
                 ])
