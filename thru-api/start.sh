@@ -8,8 +8,13 @@ set -e
 API_PORT=${PORT:-3001}
 THRU_KEY=${THRU_KEY_NAME:-frio}
 GIST_ID=${THRU_GIST_ID:-"65291a33ad7e375cd86e8814e7000c97"}
-GITHUB_TOKEN=$(gh auth token 2>/dev/null || echo "")
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
+
+# Load token from .env file
+if [ -f "$SCRIPT_DIR/.env" ]; then
+    export $(grep -v '^#' "$SCRIPT_DIR/.env" | xargs)
+fi
+GITHUB_TOKEN=${THRU_GITHUB_TOKEN:-$(gh auth token 2>/dev/null || echo "")}
 
 update_gist() {
     local url="$1"
