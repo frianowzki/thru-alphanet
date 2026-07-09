@@ -161,7 +161,7 @@ thru keys generate default
 thru account create default
 
 # 6. Get testnet tokens
-thru faucet request default
+thru faucet withdraw default 10000
 ```
 
 </td>
