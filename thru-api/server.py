@@ -196,6 +196,17 @@ class ThruHandler(BaseHTTPRequestHandler):
                     "--readwrite-accounts", pda,
                     program, INSTR_HEX[action],
                 ])
+
+                # Check for CLI-level errors (e.g. account_not_found)
+                cli_err = result.get("error")
+                if cli_err:
+                    err_msg = cli_err.get("message", str(cli_err)) if isinstance(cli_err, dict) else str(cli_err)
+                    return self.send_json({
+                        "success": False, "action": action, "value": None,
+                        "signature": None, "compute_units": None, "events": 0,
+                        "error": err_msg,
+                    })
+
                 tx = result.get("transaction_execute", {})
                 ok = tx.get("vm_error", -1) == 0 and tx.get("user_error_code", -1) == 0
                 value = get_counter_value(pda)
