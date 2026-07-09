@@ -27,7 +27,6 @@
         .wb{font-size:1.1rem;font-weight:700}
         .badge{display:inline-block;padding:3px 8px;border-radius:6px;font-size:.72rem;font-weight:600}
         .b-ok{background:#00b89420;color:#00b894;border:1px solid #00b89440}
-        .b-off{background:#333;color:#888}
         .log{padding:12px;background:#0d0d1a;border-radius:8px;margin-top:14px;font-family:monospace;font-size:.82rem;color:#888;max-height:180px;overflow-y:auto}
         .log .ok{color:#00b894}.log .er{color:#ff6b6b}.log .inf{color:#00d4ff}.log .tx{color:#fdcb6e}
         .ld{display:inline-block;width:14px;height:14px;border:2px solid #333;border-top-color:#00d4ff;border-radius:50%;animation:sp .7s linear infinite}
@@ -35,9 +34,10 @@
         .ft{text-align:center;margin-top:32px;color:#555;font-size:.82rem}
         a{color:#00d4ff;text-decoration:none}.hid{display:none}
         .sec{margin-top:12px;padding:12px;background:#0d0d1a;border-radius:8px;border:1px dashed #2a2a3e}
-        .sec p{font-size:.8rem;color:#666;margin-bottom:8px}
+        .sec p{font-size:.8rem;color:#666;margin-bottom:6px}
         .row{display:flex;gap:8px}.row .ig{flex:1}
-        .divider{border:none;border-top:1px solid #2a2a3e;margin:16px 0}
+        .status-dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:6px}
+        .dot-green{background:#00b894}.dot-red{background:#ff6b6b}.dot-yellow{background:#fdcb6e}
     </style>
 </head>
 <body>
@@ -62,14 +62,14 @@
                 <input type="text" id="pda" value="tazoq1-tfh31JRP8_oobSNku4zS6p3B_3c1Yw82g9ajUDF">
             </div>
         </div>
-        <div class="ig">
-            <label>API Endpoint</label>
-            <input type="text" id="apiUrl" placeholder="https://your-api.com" value="">
+        <div style="margin-bottom:12px">
+            <span class="status-dot dot-yellow" id="api-dot"></span>
+            <span style="font-size:.8rem;color:#888" id="api-status">Connecting to API...</span>
         </div>
         <button class="btn btn-connect" onclick="connectWallet()">Connect & Load</button>
     </div>
 
-    <!-- Wallet Card (hidden until connected) -->
+    <!-- Wallet Card -->
     <div class="card hid" id="wallet-card">
         <h2>🔐 Wallet</h2>
         <div class="wi">
@@ -93,22 +93,21 @@
         </div>
     </div>
 
-    <!-- Security Info -->
+    <!-- Security -->
     <div class="card">
         <h2>🔒 Security</h2>
         <div class="sec">
-            <p>✓ Private key is <b>only</b> sent per-request via HTTPS</p>
-            <p>✓ Key is <b>never stored</b> on server, logs, or database</p>
-            <p>✓ Key exists <b>only in your browser</b> memory</p>
+            <p>✓ Private key <b>never stored</b> on server</p>
+            <p>✓ Key is ephemeral — imported → used → deleted per-request</p>
+            <p>✓ All communication encrypted (HTTPS/TLS)</p>
             <p>✓ Server owner <b>cannot access</b> your key</p>
-            <p>✓ All communication is encrypted (TLS/HTTPS)</p>
         </div>
     </div>
 
     <!-- Log -->
     <div class="card">
         <h2>📋 Activity Log</h2>
-        <div class="log" id="log"><div class="inf">Ready. Enter your private key and connect.</div></div>
+        <div class="log" id="log"><div class="inf">Initializing...</div></div>
     </div>
 
     <div class="ft">
@@ -118,8 +117,10 @@
 </div>
 
 <script>
+const DISCOVERY_GIST = 'https://gist.githubusercontent.com/frianowzki/65291a33ad7e375cd86e8814e7000c97/raw/api-url.txt';
 const logEl = document.getElementById('log');
 let connected = false;
+let API_BASE = '';
 
 function log(m, t='inf') {
     const d = document.createElement('div');
@@ -129,19 +130,42 @@ function log(m, t='inf') {
     logEl.scrollTop = logEl.scrollHeight;
 }
 
-function getCfg() {
-    return {
-        key: document.getElementById('privkey').value.trim(),
-        program: document.getElementById('program').value.trim(),
-        pda: document.getElementById('pda').value.trim(),
-        api: document.getElementById('apiUrl').value.trim() || '',
-    };
+function setApiStatus(state, text) {
+    const dot = document.getElementById('api-dot');
+    const lbl = document.getElementById('api-status');
+    dot.className = 'status-dot ' + ({ok:'dot-green', err:'dot-red', wait:'dot-yellow'}[state]||'dot-yellow');
+    lbl.textContent = text;
+}
+
+// ── Auto-discover API endpoint from Gist ──
+async function discoverAPI() {
+    log('Discovering API endpoint...');
+    try {
+        const res = await fetch(DISCOVERY_GIST + '?t=' + Date.now());
+        if (!res.ok) throw new Error('Gist fetch failed');
+        const url = (await res.text()).trim();
+        if (!url.startsWith('https://')) throw new Error('Invalid URL');
+
+        // Verify API is reachable
+        const check = await fetch(url + '/api/status', { signal: AbortSignal.timeout(5000) });
+        const data = await check.json();
+        if (data.gethealth?.status === 'serving') {
+            API_BASE = url;
+            setApiStatus('ok', `API connected (${new URL(url).hostname.substring(0,20)}…)`);
+            log(`API discovered: ${url.substring(0, 40)}…`, 'ok');
+            return true;
+        }
+        throw new Error('API not healthy');
+    } catch (e) {
+        setApiStatus('err', 'API offline — try again later');
+        log(`Discovery failed: ${e.message}`, 'er');
+        return false;
+    }
 }
 
 async function api(path, opts = {}) {
-    const cfg = getCfg();
-    const base = cfg.api;
-    const res = await fetch(base + path, {
+    if (!API_BASE) throw new Error('API not connected');
+    const res = await fetch(API_BASE + path, {
         method: opts.method || 'GET',
         headers: { 'Content-Type': 'application/json' },
         body: opts.body ? JSON.stringify(opts.body) : undefined,
@@ -149,16 +173,21 @@ async function api(path, opts = {}) {
     return res.json();
 }
 
+// ── Wallet ──
 async function connectWallet() {
-    const cfg = getCfg();
-    if (!cfg.key) { log('Enter your private key first', 'er'); return; }
-    if (!cfg.program || !cfg.pda) { log('Fill program + PDA addresses', 'er'); return; }
+    const pk = document.getElementById('privkey').value.trim();
+    const program = document.getElementById('program').value.trim();
+    const pda = document.getElementById('pda').value.trim();
+
+    if (!pk) { log('Enter your private key first', 'er'); return; }
+    if (!program || !pda) { log('Fill program + PDA addresses', 'er'); return; }
+    if (!API_BASE) { log('API not connected. Wait or refresh.', 'er'); return; }
 
     log('Connecting...');
     try {
         const data = await api('/api/wallet/balance', {
             method: 'POST',
-            body: { privateKey: cfg.key },
+            body: { privateKey: pk },
         });
         if (data.error) throw new Error(data.error);
 
@@ -170,7 +199,6 @@ async function connectWallet() {
         document.querySelectorAll('.btns .btn').forEach(b => b.disabled = false);
         log(`Connected: ${data.address.substring(0, 28)}…`, 'ok');
         log(`Balance: ${data.balance} tokens`, 'inf');
-
         await readVal();
     } catch (e) {
         log(`Error: ${e.message}`, 'er');
@@ -178,10 +206,10 @@ async function connectWallet() {
 }
 
 async function readVal() {
-    const cfg = getCfg();
+    const pda = document.getElementById('pda').value.trim();
     log('Reading counter from chain...');
     try {
-        const data = await api(`/api/counter/value?pda=${encodeURIComponent(cfg.pda)}&program=${encodeURIComponent(cfg.program)}`);
+        const data = await api(`/api/counter/value?pda=${encodeURIComponent(pda)}`);
         if (data.error) throw new Error(data.error);
         document.getElementById('counter').textContent = data.value;
         log(`Counter: ${data.value}`, 'ok');
@@ -193,7 +221,9 @@ async function readVal() {
 
 async function exec(action) {
     if (!connected) { log('Connect first', 'er'); return; }
-    const cfg = getCfg();
+    const pk = document.getElementById('privkey').value.trim();
+    const pda = document.getElementById('pda').value.trim();
+    const program = document.getElementById('program').value.trim();
     const btnMap = { increment: 'btn-i', decrement: 'btn-d', reset: 'btn-r' };
     const btn = document.getElementById(btnMap[action]);
     const orig = btn?.textContent;
@@ -204,7 +234,7 @@ async function exec(action) {
     try {
         const data = await api('/api/counter/execute', {
             method: 'POST',
-            body: { privateKey: cfg.key, pda: cfg.pda, program: cfg.program, action },
+            body: { privateKey: pk, pda, program, action },
         });
         if (data.error && !data.success) throw new Error(data.error);
 
@@ -213,15 +243,8 @@ async function exec(action) {
             log(`${action} → ${data.value}`, 'ok');
             log(`TX: ${data.signature?.substring(0, 36)}…`, 'tx');
             log(`CU: ${data.compute_units}`, 'inf');
-
-            // Refresh balance
-            const bal = await api('/api/wallet/balance', {
-                method: 'POST',
-                body: { privateKey: cfg.key },
-            });
-            if (bal.balance !== undefined) {
-                document.getElementById('wallet-bal').textContent = bal.balance.toLocaleString();
-            }
+            const bal = await api('/api/wallet/balance', { method: 'POST', body: { privateKey: pk } });
+            if (bal.balance !== undefined) document.getElementById('wallet-bal').textContent = bal.balance.toLocaleString();
         } else {
             log(`Failed: ${data.error || 'unknown'}`, 'er');
         }
@@ -233,8 +256,12 @@ async function exec(action) {
     }
 }
 
-log('Thru Counter v7 — Real on-chain');
-log('Enter your private key, set API endpoint, and connect.');
+// ── Init ──
+(async () => {
+    log('Thru Counter v7 — Real on-chain');
+    const ok = await discoverAPI();
+    if (ok) log('Ready. Enter your private key and connect.');
+})();
 </script>
 </body>
 </html>
