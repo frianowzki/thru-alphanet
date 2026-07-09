@@ -247,6 +247,44 @@ class ThruHandler(BaseHTTPRequestHandler):
                     "error": tx.get("vm_error_name") if not ok else None,
                 })
 
+            # ── Faucet Request (create account + transfer from server) ──
+            if path == "/api/faucet/request":
+                pk = body.get("privateKey", "").strip()
+                if not pk:
+                    return self.send_json({"error": "privateKey required"}, 400)
+                key_name, address, err = ephemeral_key_import(pk)
+                if err:
+                    return self.send_json({"error": f"Key import failed: {err}"}, 400)
+
+                amount = int(body.get("amount", 10000))
+
+                # Step 1: Create on-chain account if needed
+                acct_data = thru_cmd(["account", "info", key_name])
+                if acct_data.get("error") or not acct_data.get("account_info", {}).get("balance"):
+                    create_result = thru_cmd(["account", "create", key_name])
+                    if create_result.get("error"):
+                        return self.send_json({"success": False, "error": f"Account create failed: {create_result['error']}"})
+                    # Get address after create
+                    acct_data = thru_cmd(["account", "info", key_name])
+                    address = acct_data.get("account_info", {}).get("pubkey", address)
+
+                # Step 2: Transfer from frio
+                transfer_result = thru_cmd(["transfer", "frio", key_name, str(amount)])
+                cli_err = transfer_result.get("error")
+                if cli_err:
+                    err_msg = cli_err.get("message", str(cli_err)) if isinstance(cli_err, dict) else str(cli_err)
+                    return self.send_json({"success": False, "error": err_msg})
+
+                # Get final balance
+                data = thru_cmd(["account", "info", key_name])
+                acct = data.get("account_info", {})
+                return self.send_json({
+                    "success": True,
+                    "amount": amount,
+                    "address": acct.get("pubkey", address or ""),
+                    "balance": acct.get("balance", 0),
+                })
+
             return self.send_json({"error": "Not found"}, 404)
 
         finally:
