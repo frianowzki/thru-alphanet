@@ -13,7 +13,7 @@
 
 <p align="center">
   <b>Complete Developer Guide</b><br>
-  <sub>Build ultra-high performance programs on Thru — the RISC-V blockchain</sub>
+  <sub>Build ultra-high performance programs on Thru</sub>
 </p>
 
 <p align="center">
